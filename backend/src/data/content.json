@@ -1,12 +1,15 @@
 {
-  "about": "GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg.",
+  "about": {"label": "Über uns", "content": "GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg."},
   "services": {
-    "training": "Personal Training im Studio oder Outdoor",
-    "nutrition": "Ernährungsberatung",
-    "group": "Gruppenkurse"
+    "training": {"label": "Personal Training", "content": "Personal Training im Studio oder Outdoor"},
+    "nutrition": {"label": "Ernährungsberatung", "content": "Ernährungsberatung für einen gesunden Lebensstil"},
+    "group": {"label": "Gruppenkurse", "content": "Gruppenkurse für mehr Motivation"}
   },
   "contact": {
-    "email": "kontakt@greenfit-demo.de",
-    "phone": "+49 123 456789"
-  }
+    "email": {"label": "E-Mail", "content": "kontakt@greenfit-demo.de"},
+    "phone": {"label": "Telefon", "content": "+49 123 456789"}
+  },
+  "impressum": {"label": "Impressum", "content": "Impressum: Musterstraße 1, 12345 Musterstadt"},
+  "privacy": {"label": "Datenschutz", "content": "Datenschutz: Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften. Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage genutzt und nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben. Weitere Informationen finden  Sie in unserer Datenschutzerklärung."},
+  "terms": {"label": "AGB", "content": "AGB: Unsere Allgemeinen Geschäftsbedingungen finden Sie hier."}
 }

@@ -5,6 +5,7 @@ const contentPath = path.join(__dirname, '../data/content.json');
 
 exports.getContent = (req, res) => {
   const content = JSON.parse(fs.readFileSync(contentPath, 'utf8'));
+  console.log(content);
   res.json(content);
 };
 
