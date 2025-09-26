@@ -7,6 +7,13 @@ import { useContent } from "@/hooks/useContent";
 
 import { ContentData } from "@/types/contentData";
 
+import HamburgerButton from "@/components/Navigation/HamburgerButton";
+import OverlayMenu from "@/components/Navigation/OverlayMenu";
+import ScrollToTopButton from "@/components/Navigation/ScrollToTopButton";
+import Menu from "@/components/Navigation/Menu";
+import FormSection from "@/components/FormSection";
+import ContentSection from "@/components/ContentSection";
+
 import Image from "next/image";
 
 export default function Home() {
@@ -90,175 +97,94 @@ export default function Home() {
   return (
 
     <main className="flex flex-col items-center">
-      
-      {/* Hamburger-Menü */}
-      <button
-        className="fixed top-6 left-6 z-50 flex flex-col justify-center items-center w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 focus:outline-none"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Menü öffnen"
-      >
-        <span className="block w-6 h-0.5 bg-green-700 mb-1"></span>
-        <span className="block w-6 h-0.5 bg-green-700 mb-1"></span>
-        <span className="block w-6 h-0.5 bg-green-700"></span>
-      </button>
+         {/* Header */}
+          <header className="w-full bg-green-700 text-white py-4 text-center font-bold text-xl">
+            GreenFit
+          </header>
+        {/* Menü */}
 
-      {/* Overlay-Menü */}
-      {menuOpen && (
-        <nav className="fixed inset-0 bg-black bg-opacity-60 z-40 flex flex-col items-center justify-center">
+        <Menu /> {/* Desktop-Menü */} 
+        <HamburgerButton onClick={() => setMenuOpen(!menuOpen)} isOpen={menuOpen} />
+        {menuOpen && (
+            <OverlayMenu isAuthenticated={isAuthenticated} onClose={() => setMenuOpen(false)} />
+        )}
+        {showScrollTop && (
+            <ScrollToTopButton onClick={scrollToTop} />
+        )}
+
+        {/* Hero */}
+        <ContentSection id="hero" title="" className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-6 text-center">
+            {/* Hero-Bereich */}
+            <h1 className="text-5xl font-extrabold text-green-700 mb-4">GreenFit</h1>
+            <p className="text-lg text-gray-700 mb-8">
+                Personal Training Studio in Hamburg – Fit werden mit individueller Betreuung
+            </p>
+        <a
+            href="#contact"
+            className="px-6 py-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition"
+        >
+            Jetzt Termin anfragen
+        </a>
+        </ContentSection>
+
+        {/* Über uns */}
+        <ContentSection id="about" title="Über uns" className="max-w-3xl mx-auto">
+            <p className="text-gray-700 text-center">
+                GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg.
+                Unser Ziel: Deine Fitnessziele effektiv und nachhaltig erreichen – mit Spaß und Motivation.
+            </p>
+        </ContentSection>
+
+        {/* Kontakt */}
+        <ContentSection id="contact" title="Kontakt" className="max-w-3xl mx-auto">
+            <p className="text-gray-700 text-center">
+                Bei Fragen oder zur Terminvereinbarung erreichen Sie uns über das <a href="#contact" className="text-green-600 underline">Kontaktformular</a>.
+            </p>
+        </ContentSection>
+
+        {/* Kontaktformular */}
+        <FormSection title="Kontakt" message="Schreiben Sie uns – wir melden uns schnellstmöglich zurück!" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Ihr Name"
+            className="p-2 border rounded text-gray-700"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Ihre E-Mail"
+            className="p-2 border rounded text-gray-700"
+            required
+          />
+          <textarea
+            name="message"
+            rows={5}
+            placeholder="Ihre Nachricht"
+            className="p-2 border rounded text-gray-700"
+            required
+          />
           <button
-            className="absolute top-8 right-8 text-white text-3xl"
-            onClick={() => setMenuOpen(false)}
-            aria-label="Menü schließen"
+            type="submit"
+            className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
           >
-            &times;
+            Nachricht senden
           </button>
-          <ul className="space-y-8 text-2xl font-bold text-white">
-            <li>
-              <a href="#about" onClick={() => setMenuOpen(false)}>
-                Über uns
-              </a>
-            </li>
-            <li>
-              <a href="#services" onClick={() => setMenuOpen(false)}>
-                Leistungen
-              </a>
-            </li>
-            <li>
-              <a href="#contact" onClick={() => setMenuOpen(false)}>
-                Kontakt
-              </a>
-            </li>
-            {isAuthenticated ? (
-            <li>
-              <a href="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</a>
-            </li>
-            ) : (
-            <li>
-              <a href="/admin/login" onClick={() => setMenuOpen(false)}>Login</a>
-            </li>
-            )}
-          </ul>
-        </nav>
-      )}
-      {/* Scroll-to-top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition flex items-center justify-center"
-          aria-label="Nach oben scrollen"
-        >
-          {/* Pfeil-Icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
-      {/* Scroll-to-top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition flex items-center justify-center"
-          aria-label="Nach oben scrollen"
-        >
-          {/* Pfeil-Icon */}
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
+        </FormSection>
 
-      {/* Hero */}
-      <section className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-green-100 to-green-200 p-6 text-center">
-        <h1 className="text-5xl font-extrabold text-green-700 mb-4">GreenFit</h1>
-        <p className="text-lg text-gray-700 mb-8">
-          Personal Training Studio in Hamburg – Fit werden mit individueller Betreuung
-        </p>
-       <a
-        href="#contact"
-        className="px-6 py-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition"
-      >
-        Jetzt Termin anfragen
-      </a>
-
-      </section>
-      
-
-      {/* Über uns */}
-      <section id="about" className="max-w-3xl py-20 px-6">
-        <h2 className="text-3xl font-bold text-center text-green-700 mb-6">Über uns</h2>
-        <p className="text-gray-700 text-center">
-          GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg.
-          Unser Ziel: Deine Fitnessziele effektiv und nachhaltig erreichen – mit Spaß und Motivation.
-        </p>
-      </section>
-
-      <section id="contact" className="flex items-center justify-center py-12">
-        <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-          <h2 className="text-2xl font-bold text-green-700 mb-4 text-center">
-            Kontakt
-          </h2>
-          <p className="text-center text-gray-600 mb-6">
-            Schreiben Sie uns – wir melden uns schnellstmöglich zurück!
-          </p>
-          <form
-            method="post"
-            onSubmit={handleSubmit}
-            className="flex flex-col space-y-4"
-          >
-            <input
-              type="text"
-              name="name"
-              placeholder="Ihr Name"
-              className="p-2 border rounded text-gray-700"
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Ihre E-Mail"
-              className="p-2 border rounded text-gray-700"
-              required
-            />
-            <textarea
-              name="message"
-              rows={5}
-              placeholder="Ihre Nachricht"
-              className="p-2 border rounded text-gray-700"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-            >
-              Nachricht senden
-            </button>
-            {contactSentStatus && (
-              <div className="mt-4 text-center text-green-700 font-semibold">
-                {contactSentStatus}
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-                >
-                  Zurück
-                </button>
-              </div>
-            )}
-          </form>
-        </div>
-      </section>
+     
 
       {/* Leistungen */}
-      <section id="services" className="bg-green-50 w-full py-20 px-6">
-        <h2 className="text-3xl font-bold text-center text-green-700 mb-6">Unsere Leistungen</h2>
-        <ul className="max-w-xl mx-auto space-y-4 text-gray-700">
+      <ContentSection id="services" title="Unsere Leistungen" className="max-w-3xl mx-auto">
+        <ul className="space-y-4 text-gray-700">
           {Object.entries(content.services).map(([key, value]) => (
             <li key={key} className="p-4 bg-white rounded-lg shadow">
               <strong>{value.label}</strong> – {value.content}
             </li>
           ))}
         </ul>
-      </section>
+      </ContentSection>
     
 
      

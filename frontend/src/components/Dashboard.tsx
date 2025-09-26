@@ -7,6 +7,8 @@ import { useContent } from "@/hooks/useContent";
 import { ContentData } from "@/types/contentData";
 import DashboardForm from "@/components/ui/dashboard/DashboardForm";
 
+import AdminHeader from "@/components/Navigation/admin/AdminHeader";
+
 import { useContentContext } from "@/contexts/contentContext";
 
 
@@ -104,11 +106,12 @@ export default function ContentPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6 w-full">
+        <AdminHeader />
        <div className="w-full max-w-4xl">
         <button
             type="button"
             onClick={() => router.back()}
-            className="self-start mb-4 px-4 py-2 bg-gray-700 rounded hover:bg-gray-300 transition "
+            className="self-start mb-4 px-4 py-2 bg-gray-600 rounded hover:bg-gray-300 transition text-white hover:text-gray-800"
         >
             ← Zurück
         </button>
