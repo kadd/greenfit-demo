@@ -15,10 +15,12 @@ import { useContentContext } from "@/contexts/contentContext";
 
 import ContentTab from "./ContentTab";
 import ContactTab from "./ContactTab";
+import FaqTab from "./FaqTab";
+import BlogTab from "./BlogTab";
 
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
-  const [activeTab, setActiveTab] = useState<"content" | "contacts">("content");
+  const [activeTab, setActiveTab] = useState<"content" | "contacts" | "blog"| "faq">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
 
@@ -119,6 +121,19 @@ export default function ContentPage() {
             >
               Kontaktanfragen
             </button>
+            <button
+              className={`py-2 px-4 font-semibold ${activeTab === "blog" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("blog")}
+            >
+              Blog verwalten
+            </button>
+            <button
+              className={`py-2 px-4 font-semibold ${activeTab === "faq" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("faq")}
+            >
+              FAQ verwalten
+            </button>
+        
           </div>
         </div>
 
@@ -129,6 +144,24 @@ export default function ContentPage() {
         )}
         {activeTab === "contacts" && (
           <ContactTab contacts={contacts} onDelete={onDelete} />
+        )}
+        {activeTab === "blog" && (
+          <BlogTab
+            blog={content.blog}
+            setBlog={newBlog => setContent(prev => ({ ...prev, blog: newBlog }))}
+            handleSave={handleSave}
+            msg={msg}
+            router={router}
+          />
+        )}
+        {activeTab === "faq" && (
+          <FaqTab
+            faq={content.faq}
+            setFaq={newFaq => setContent(prev => ({ ...prev, faq: newFaq }))}
+            handleSave={handleSave}
+            msg={msg}
+            router={router}
+          />
         )}
       </div>
       </div>

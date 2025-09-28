@@ -12,6 +12,8 @@ export function getEmptyContentData(): ContentData {
       impressum: "",
       privacy: "",
       terms: "",
+      faq: "",
+      blog: "",
     },
     about: { label: "", content: "" },
     services: {
@@ -32,6 +34,9 @@ export function getEmptyContentData(): ContentData {
     impressum: { label: "", content: "" },
     privacy: { label: "", content: "" },
     terms: { label: "", content: "" },
+    faq: { title: "", items: [] },
+    blog: { title: "", description: "", items: [] },
+
   };
 }
 
@@ -40,13 +45,15 @@ export function mapContentData(data: any): ContentData {
     title: data?.title || "",
     metaDescription: data?.metaDescription || "",
     header: {
-      home: data?.header?.home || "",
-      about: data?.header?.about || "",
-      services: data?.header?.services || "",
-      contact: data?.header?.contact || "",
-      impressum: data?.header?.impressum || "",
-      privacy: data?.header?.privacy || "",
-      terms: data?.header?.terms || "",
+        home: data?.header?.home || "",
+        about: data?.header?.about || "",
+        services: data?.header?.services || "",
+        contact: data?.header?.contact || "",
+        impressum: data?.header?.impressum || "",
+        privacy: data?.header?.privacy || "",
+        terms: data?.header?.terms || "",
+        faq: data?.header?.faq || "",
+        blog: data?.header?.blog || "",
     },
     about: {
       label: data?.about?.label || "",
@@ -85,5 +92,14 @@ export function mapContentData(data: any): ContentData {
       label: data?.terms?.label || "",
       content: data?.terms?.content || "",
     },
+    faq: {
+      title: data?.faq?.title || "",
+      items: Array.isArray(data?.faq?.items) ? data.faq.items : [],
+    },
+    blog: {
+        title: data?.blog?.title || "",
+        description: data?.blog?.description || "",
+        items: Array.isArray(data?.blog?.items) ? data.blog.items : [],
+        },
   };
 }

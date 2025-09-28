@@ -8,7 +8,9 @@
     "contact": "Kontakt",
     "impressum": "Impressum",
     "privacy": "Datenschutz",
-    "terms": "AGB"
+    "terms": "AGB",
+    "faq": "FAQ",
+    "blog": "Blog/News"
   },
   "about": {
     "label": "Über uns",
@@ -55,5 +57,34 @@
   "terms": {
     "label": "AGB",
     "content": "Unsere Allgemeinen Geschäftsbedingungen finden Sie hier."
+  },
+  "faq": {
+    "title": "Häufige Fragen",
+    "items": [
+      {
+        "question": "Wie buche ich eine Trainingseinheit?",
+        "answer": "Sie können eine Trainingseinheit über unser Kontaktformular oder telefonisch buchen."
+      },
+      {
+        "question": "Welche Zahlungsmethoden werden akzeptiert?",
+        "answer": "Wir akzeptieren Barzahlung, Überweisung und gängige Kreditkarten."
+      }
+    ]
+  },
+  "blog": {
+    "title": "Neuigkeiten",
+    "description": "Bleiben Sie auf dem Laufenden mit unseren neuesten Beiträgen und Tipps zu Fitness und Gesundheit.",
+    "items": [
+      {
+        "title": "Neueröffnung unseres Studios",
+        "date": "2023-01-15",
+        "excerpt": "Wir freuen uns, die Eröffnung unseres neuen Studios in Hamburg bekannt zu geben."
+      },
+      {
+        "title": "Tipps für ein gesundes Frühstück",
+        "date": "2023-02-10",
+        "excerpt": "Ein gesundes Frühstück ist der Schlüssel zu einem erfolgreichen Tag. Hier sind einige Tipps."
+      }
+    ]
   }
 }

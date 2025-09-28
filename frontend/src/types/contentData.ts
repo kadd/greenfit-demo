@@ -9,6 +9,8 @@ export type ContentData = {
     impressum: string;
     privacy: string;
     terms: string;
+    faq: string;
+    blog: string;
   };
   about: { label: string; content: string };
   services: {
@@ -39,4 +41,17 @@ export type ContentData = {
   terms?: {
     label: string; content: string
   };
-};
+  faq?: {
+    title: string;
+    items: Array<{ question: string; answer: string }>
+  };
+  blog?: {
+    title: string;
+    description: string;
+    items: Array<{
+        title: string;
+        date: string;
+        excerpt: string;
+      }>
+    }
+  };
