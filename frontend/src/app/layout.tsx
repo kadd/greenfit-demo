@@ -1,8 +1,12 @@
+import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { ContentProvider } from "@/contexts/contentContext";
+
+import Menu from "@/components/Navigation/Menu";
+import HamburgerButton from "@/components/Navigation/HamburgerButton";
 
 
 
@@ -26,12 +30,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="de">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}>
         <ContentProvider>
           {/* Hauptinhalt */}
           <main className="min-h-[80vh] flex flex-col items-center justify-center">
+            <Menu />
+            
             {children}
           </main>
           

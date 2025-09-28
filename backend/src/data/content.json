@@ -50,6 +50,28 @@
     "label": "Impressum",
     "content": "Impressum: Musterstraße 1, 12345 Musterstadt"
   },
+  "impressumLong": {
+    "isPage": true,
+    "title": "Impressum",
+    "sections": [
+      {
+        "heading": "Angaben gemäß § 5 TMG",
+        "text": "GreenFit\nMusterstraße 1\n12345 Musterstadt"
+      },
+      {
+        "heading": "Kontakt",
+        "text": "Telefon: +49 123 456789\nE-Mail: kontakt@greenfit-demo.de"
+      },
+      {
+        "heading": "Umsatzsteuer-ID",
+        "text": "Umsatzsteuer-Identifikationsnummer gemäß §27a Umsatzsteuergesetz: DE123456789"
+      },
+      {
+        "heading": "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV",
+        "text": "Katja Alsleben\nMusterstraße 1\n12345 Musterstadt"
+      }
+    ]
+  },
   "privacy": {
     "label": "Datenschutz",
     "content": "Datenschutz: Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften. Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage genutzt und nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben. Weitere Informationen finden Sie in unserer Datenschutzerklärung."
@@ -58,7 +80,76 @@
     "label": "AGB",
     "content": "Unsere Allgemeinen Geschäftsbedingungen finden Sie hier."
   },
+  "termsLong": {
+    "isPage": true,
+    "title": "Allgemeine Geschäftsbedingungen (AGB)",
+    "sections": [
+      {
+        "heading": "1. Vertragsgegenstand",
+        "text": "Diese Allgemeinen Geschäftsbedingungen (AGB) regeln die Nutzung der Dienstleistungen von GreenFit, einschließlich Personal Training, Ernährungsberatung und Gruppenkurse."
+      },
+      {
+        "heading": "2. Vertragsschluss",
+        "text": "Der Vertrag kommt durch die Anmeldung des Kunden und die Bestätigung durch GreenFit zustande."
+      },
+      {
+        "heading": "3. Leistungen",
+        "text": "GreenFit bietet individuelle Trainings- und Beratungsleistungen an, die im Vertrag näher beschrieben sind."
+      },
+      {
+        "heading": "4. Preise und Zahlung",
+        "text": "Die Preise für die Dienstleistungen sind im Vertrag festgelegt. Zahlungen sind vor Beginn der Leistungen fällig."
+      },
+      {
+        "heading": "5. Stornierung und Rücktritt",
+        "text": "Stornierungen müssen mindestens 24 Stunden vor dem Termin erfolgen. Bei späteren Stornierungen oder Nichterscheinen wird die volle Gebühr fällig."
+      },
+      {
+        "heading": "6. Haftung",
+        "text": "GreenFit haftet nur für Schäden, die auf grober Fahrlässigkeit oder Vorsatz beruhen."
+      },
+      {
+        "heading": "7. Datenschutz",
+        "text": "GreenFit verpflichtet sich, die personenbezogenen Daten der Kunden gemäß den geltenden Datenschutzbestimmungen zu schützen."
+      },
+      {
+        "heading": "8. Schlussbestimmungen",
+        "text": "Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt."
+      }
+    ]
+  },
+  "privacyLong": {
+    "isPage": true,
+    "title": "Datenschutzerklärung",
+    "sections": [
+      {
+        "heading": "1. Verantwortlicher",
+        "text": "Verantwortlicher für die Datenverarbeitung ist GreenFit, Musterstraße 1, 12345 Musterstadt."
+      },
+      {
+        "heading": "2. Erhebung und Verarbeitung personenbezogener Daten",
+        "text": "Wir erheben und verarbeiten personenbezogene Daten nur, soweit dies zur Erfüllung unserer Dienstleistungen erforderlich ist."
+      },
+      {
+        "heading": "3. Nutzung und Weitergabe personenbezogener Daten",
+        "text": "Personenbezogene Daten werden nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben, außer wenn dies zur Vertragserfüllung notwendig ist."
+      },
+      {
+        "heading": "4. Rechte der betroffenen Personen",
+        "text": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer personenbezogenen Daten."
+      },
+      {
+        "heading": "5. Datensicherheit",
+        "text": "Wir treffen angemessene technische und organisatorische Maßnahmen, um Ihre Daten vor Verlust, Missbrauch und unbefugtem Zugriff zu schützen."
+      },
+      {
+        "heading": "6. Änderungen der Datenschutzerklärung",
+        "text": "Wir behalten uns das Recht vor, diese Datenschutzerklärung jederzeit zu ändern. Die aktuelle Version ist stets auf unserer Website verfügbar."
+      }
+    ]
+  },
   "faq": {
+    "isPage": true,
     "title": "Häufige Fragen",
     "items": [
       {
@@ -72,6 +163,7 @@
     ]
   },
   "blog": {
+    "isPage": true,
     "title": "Neuigkeiten",
     "description": "Bleiben Sie auf dem Laufenden mit unseren neuesten Beiträgen und Tipps zu Fitness und Gesundheit.",
     "items": [

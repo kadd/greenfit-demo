@@ -10,9 +10,10 @@ import { ContentData } from "@/types/contentData";
 import HamburgerButton from "@/components/Navigation/HamburgerButton";
 import OverlayMenu from "@/components/Navigation/OverlayMenu";
 import ScrollToTopButton from "@/components/Navigation/ScrollToTopButton";
-import Menu from "@/components/Navigation/Menu";
+
 import ContactForm from "@/components/ui/contact/ContactForm";
 import ContentSection from "@/components/ContentSection";
+import FaqPage from "@/components/FaqPage";
 
 import Footer from "@/components/Footer";
 
@@ -77,14 +78,7 @@ export default function Home() {
 
   return (
     <>
-      <header className="w-full bg-green-700 text-white py-4 text-center font-bold text-xl">
-        <div className="flex flex-col items-center">
-         <a href="/" className="text-2xl font-bold hover:underline">GreenFit</a>
-          {/* Menü */}
-          <Menu /> {/* Desktop-Menü */}
-          <HamburgerButton onClick={() => setMenuOpen(!menuOpen)} isOpen={menuOpen} />
-        </div>
-      </header>
+    
    
       <main className="flex flex-col items-center">
          {/* Header */}
@@ -97,40 +91,41 @@ export default function Home() {
         )}
 
         {/* Hero */}
-        <ContentSection id="hero" title="" className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-6 text-center">
-            {/* Hero-Bereich */}
-            <h1 className="text-5xl font-extrabold text-green-700 mb-4">GreenFit</h1>
+        <ContentSection id="hero" title="" className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-6 text-center relative">
+          {/* Optional: Hintergrundbild */}
+          {/* <Image src="/hero.jpg" alt="GreenFit Studio" fill className="object-cover opacity-20 absolute inset-0 z-0" /> */}
+          <div className="relative z-10">
+            <h1 className="text-5xl font-extrabold text-green-700 mb-4 drop-shadow-lg">GreenFit</h1>
             <p className="text-lg text-gray-700 mb-8">
-                Personal Training Studio in Hamburg – Fit werden mit individueller Betreuung
+              Personal Training Studio in Hamburg – Fit werden mit individueller Betreuung
             </p>
-        <a
-            href="#contact"
-            className="px-6 py-3 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition"
-        >
-            Jetzt Termin anfragen
-        </a>
+            <a
+              href="#contact"
+              className="px-8 py-4 bg-green-600 text-white rounded-xl shadow-lg hover:bg-green-700 transition transform hover:scale-105 font-bold text-lg"
+            >
+              Jetzt Termin anfragen
+            </a>
+          </div>
         </ContentSection>
 
         {/* Über uns */}
         <ContentSection id="about" title={`${content.about.label}`} className="max-w-3xl mx-auto">
-            <p className="text-gray-700 text-center">
+            <p className="text-gray-700 text-center lg:text-lg">
                 {content.about.content}
             </p>
         </ContentSection>
 
         {/* Kontakt */}
-        <ContentSection id="contact" title={`${content.contact.label}`} className="max-w-3xl mx-auto">
-            <p className="text-gray-700 text-center">
-                Bei Fragen oder zur Terminvereinbarung erreichen Sie uns über das <a href="#contact" className="text-green-600 underline">Kontaktformular</a>.
+        <ContentSection id="contact" title={`${content.contact.label}`} className="max-w-3xl mx-auto bg-green-50 rounded-xl shadow p-8 my-8">
+            <p className="text-gray-700 text-center mb-4">
+              Bei Fragen oder zur Terminvereinbarung erreichen Sie uns über das <a href="#contact" className="text-green-600 underline">Kontaktformular</a>.
             </p>
-        </ContentSection>
+       
 
-        {/* Kontaktformular */}
-        <ContactForm info_message="Schreiben Sie uns – wir melden uns schnellstmöglich zurück!" />
-
-        {/* Kontaktinformationen */}
-
-        <ContentSection id="contact-info" title={`${content.contact.label}`} className="max-w-3xl mx-auto">
+      
+          <ContactForm info_message="Schreiben Sie uns – wir melden uns schnellstmöglich zurück!" />
+      
+       
             <div className="text-center text-gray-700 space-y-2">
                 {content.contact.content.email && (
                     <p>
@@ -154,15 +149,18 @@ export default function Home() {
         
 
       {/* Leistungen */}
-        <ContentSection id="services" title={`${content.services.label}`} className="max-w-3xl mx-auto">
-             <ul className="space-y-4 text-gray-700">
+       <ContentSection id="services" title={content.services.label} className="max-w-4xl mx-auto my-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {Object.entries(content.services.content).map(([key, value]) => (
-            <li key={key} className="p-4 bg-white rounded-lg shadow">
-              <strong>{value.label}</strong> – {value.content}
-            </li>
+            <div key={key} className="p-6 bg-white rounded-lg shadow flex flex-col items-center">
+              {/* Optional: Icon */}
+              {/* <Image src={`/icons/${key}.svg`} alt={value.label} width={48} height={48} className="mb-2" /> */}
+              <strong className="text-green-700 text-xl mb-2">{value.label}</strong>
+              <span className="text-gray-700 text-center">{value.content}</span>
+            </div>
           ))}
-        </ul>
-        </ContentSection>
+        </div>
+      </ContentSection>
       
     
 

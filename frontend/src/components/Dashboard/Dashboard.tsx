@@ -17,10 +17,17 @@ import ContentTab from "./ContentTab";
 import ContactTab from "./ContactTab";
 import FaqTab from "./FaqTab";
 import BlogTab from "./BlogTab";
+import TermsTab from "./TermsTab";
+import ImpressumTab from "./ImpressumTab";
+import PrivacyTab from "./PrivacyTab";
+
+type Props = {};
 
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
-  const [activeTab, setActiveTab] = useState<"content" | "contacts" | "blog"| "faq">("content");
+  const [activeTab, setActiveTab] = 
+  useState<"content" | "contacts" | "blog"| "faq" | "terms" 
+  | "impressum" | "privacy">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
 
@@ -133,7 +140,24 @@ export default function ContentPage() {
             >
               FAQ verwalten
             </button>
-        
+            <button
+              className={`py-2 px-4 font-semibold ${activeTab === "terms" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("terms")}
+            >
+              AGB bearbeiten
+            </button>
+            <button
+              className={`py-2 px-4 font-semibold ${activeTab === "impressum" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("impressum")}
+            >
+              Impressum bearbeiten
+            </button>
+            <button
+              className={`py-2 px-4 font-semibold ${activeTab === "privacy" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("privacy")}
+            >
+              Datenschutz bearbeiten
+            </button>
           </div>
         </div>
 
@@ -162,6 +186,15 @@ export default function ContentPage() {
             msg={msg}
             router={router}
           />
+        )}
+        {activeTab === "terms" && (
+          <TermsTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} />
+        )}
+        {activeTab === "impressum" && (
+          <ImpressumTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} />
+        )}
+        {activeTab === "privacy" && (
+          <PrivacyTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} />
         )}
       </div>
       </div>

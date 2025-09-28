@@ -32,10 +32,25 @@ export function getEmptyContentData(): ContentData {
       },
     },
     impressum: { label: "", content: "" },
+    impressumLong: { 
+        isPage: false,
+        title: "",
+        sections: [] 
+    },
     privacy: { label: "", content: "" },
+    privacyLong: { 
+        isPage: false,
+        title: "",
+        sections: [] 
+    },
     terms: { label: "", content: "" },
-    faq: { title: "", items: [] },
-    blog: { title: "", description: "", items: [] },
+    termsLong: { 
+        isPage: false,
+        title: "",
+        sections: [] 
+    },
+    faq: { title: "", items: [], isPage: true },
+    blog: { title: "", description: "", items: [], isPage: true },
 
   };
 }
@@ -84,19 +99,36 @@ export function mapContentData(data: any): ContentData {
       label: data?.impressum?.label || "",
       content: data?.impressum?.content || "",
     },
+    impressumLong: {
+      isPage: data?.impressumLong?.isPage || false,
+      title: data?.impressumLong?.title || "",
+      sections: Array.isArray(data?.impressumLong?.sections) ? data.impressumLong.sections : [],
+    },
     privacy: {
       label: data?.privacy?.label || "",
       content: data?.privacy?.content || "",
+    },
+    privacyLong: {
+      isPage: data?.privacyLong?.isPage || false,
+      title: data?.privacyLong?.title || "",
+      sections: Array.isArray(data?.privacyLong?.sections) ? data.privacyLong.sections : [],
     },
     terms: {
       label: data?.terms?.label || "",
       content: data?.terms?.content || "",
     },
+    termsLong: {
+    isPage: data?.termsLong?.isPage || false,
+      title: data?.termsLong?.title || "",
+      sections: Array.isArray(data?.termsLong?.sections) ? data.termsLong.sections : [],
+    },
     faq: {
+      isPage: data?.faq?.isPage || false,
       title: data?.faq?.title || "",
       items: Array.isArray(data?.faq?.items) ? data.faq.items : [],
     },
     blog: {
+        isPage: data?.blog?.isPage || false,
         title: data?.blog?.title || "",
         description: data?.blog?.description || "",
         items: Array.isArray(data?.blog?.items) ? data.blog.items : [],

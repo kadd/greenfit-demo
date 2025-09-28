@@ -35,17 +35,43 @@ export type ContentData = {
   impressum?: {
     label: string; content: string
   };
+  impressumLong?: {
+    isPage?: boolean;
+    title: string;
+    sections: Array<{
+      heading: string;
+      text: string;
+    }>;
+  };
   privacy?: {
     label: string; content: string
+  };
+  privacyLong?: {
+    isPage?: boolean;
+    title: string;
+    sections: Array<{
+      heading: string;
+      text: string;
+    }>;
   };
   terms?: {
     label: string; content: string
   };
+  termsLong?: {
+    isPage?: boolean;
+    title: string;
+    sections: Array<{
+      heading: string;
+      text: string;
+    }>;
+  };
   faq?: {
+    isPage?: boolean;
     title: string;
     items: Array<{ question: string; answer: string }>
   };
   blog?: {
+    isPage?: boolean;
     title: string;
     description: string;
     items: Array<{
