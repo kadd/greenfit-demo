@@ -23,12 +23,16 @@ export function useContent(token?: string) {
     fetchContentData();
   }, [token]);
 
+  // Funktion zum Aktualisieren der Inhalte
+  const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+
   const updateContentData = async (newData: any) => {
     try {
+      setUpdateLoading(true);
       const result = await updateContentDataService(token, newData);
       setData(result);
-    } catch (err) {
-      setError(err);
+    } finally {
+      setUpdateLoading(false);
     }
   };
 

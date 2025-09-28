@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { ContentProvider } from "@/contexts/contentContext";
 
-import Footer from "@/components/Footer";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +34,7 @@ export default function RootLayout({
           <main className="min-h-[80vh] flex flex-col items-center justify-center">
             {children}
           </main>
-          {/* Footer */}
-          <Footer />
+          
         </ContentProvider>
       </body>
     </html>

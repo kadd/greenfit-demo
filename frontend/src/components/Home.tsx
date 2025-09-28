@@ -11,8 +11,12 @@ import HamburgerButton from "@/components/Navigation/HamburgerButton";
 import OverlayMenu from "@/components/Navigation/OverlayMenu";
 import ScrollToTopButton from "@/components/Navigation/ScrollToTopButton";
 import Menu from "@/components/Navigation/Menu";
-import FormSection from "@/components/FormSection";
+import ContactForm from "@/components/ui/contact/ContactForm";
 import ContentSection from "@/components/ContentSection";
+
+import Footer from "@/components/Footer";
+
+import { getEmptyContentData } from "@/utils/mapCotentData";
 
 import Image from "next/image";
 
@@ -20,23 +24,10 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [content, setContent] = useState<ContentData>({
-    about: "",
-    services: {
-      training: "",
-      nutrition: "",
-      group: "",
-    },  
-    contact: {
-      email: "",
-      phone: "",
-    },
-    impressum: "",
-    privacy: "",
-  });
+  const [content, setContent] = useState<ContentData>(getEmptyContentData());
+
   const [msg, setMsg] = useState("");
 
-  const { contactSentStatus, sendContact } = useContact();
   const { isAuthenticated } = useAuth();
   const { data, loading, error } = useContent("");
 
@@ -83,28 +74,21 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-      e.preventDefault();
-      const form = e.currentTarget;
-      const data = {
-        name: (form.elements.namedItem("name") as HTMLInputElement).value,
-        email: (form.elements.namedItem("email") as HTMLInputElement).value,
-        message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
-      };
-      await sendContact(data);
-    }
 
   return (
-
-    <main className="flex flex-col items-center">
+    <>
+      <header className="w-full bg-green-700 text-white py-4 text-center font-bold text-xl">
+        <div className="flex flex-col items-center">
+         <a href="/" className="text-2xl font-bold hover:underline">GreenFit</a>
+          {/* Menü */}
+          <Menu /> {/* Desktop-Menü */}
+          <HamburgerButton onClick={() => setMenuOpen(!menuOpen)} isOpen={menuOpen} />
+        </div>
+      </header>
+   
+      <main className="flex flex-col items-center">
          {/* Header */}
-          <header className="w-full bg-green-700 text-white py-4 text-center font-bold text-xl">
-            GreenFit
-          </header>
-        {/* Menü */}
-
-        <Menu /> {/* Desktop-Menü */} 
-        <HamburgerButton onClick={() => setMenuOpen(!menuOpen)} isOpen={menuOpen} />
+        
         {menuOpen && (
             <OverlayMenu isAuthenticated={isAuthenticated} onClose={() => setMenuOpen(false)} />
         )}
@@ -128,66 +112,64 @@ export default function Home() {
         </ContentSection>
 
         {/* Über uns */}
-        <ContentSection id="about" title="Über uns" className="max-w-3xl mx-auto">
+        <ContentSection id="about" title={`${content.about.label}`} className="max-w-3xl mx-auto">
             <p className="text-gray-700 text-center">
-                GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg.
-                Unser Ziel: Deine Fitnessziele effektiv und nachhaltig erreichen – mit Spaß und Motivation.
+                {content.about.content}
             </p>
         </ContentSection>
 
         {/* Kontakt */}
-        <ContentSection id="contact" title="Kontakt" className="max-w-3xl mx-auto">
+        <ContentSection id="contact" title={`${content.contact.label}`} className="max-w-3xl mx-auto">
             <p className="text-gray-700 text-center">
                 Bei Fragen oder zur Terminvereinbarung erreichen Sie uns über das <a href="#contact" className="text-green-600 underline">Kontaktformular</a>.
             </p>
         </ContentSection>
 
         {/* Kontaktformular */}
-        <FormSection title="Kontakt" message="Schreiben Sie uns – wir melden uns schnellstmöglich zurück!" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Ihr Name"
-            className="p-2 border rounded text-gray-700"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Ihre E-Mail"
-            className="p-2 border rounded text-gray-700"
-            required
-          />
-          <textarea
-            name="message"
-            rows={5}
-            placeholder="Ihre Nachricht"
-            className="p-2 border rounded text-gray-700"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-          >
-            Nachricht senden
-          </button>
-        </FormSection>
+        <ContactForm info_message="Schreiben Sie uns – wir melden uns schnellstmöglich zurück!" />
 
-     
+        {/* Kontaktinformationen */}
+
+        <ContentSection id="contact-info" title={`${content.contact.label}`} className="max-w-3xl mx-auto">
+            <div className="text-center text-gray-700 space-y-2">
+                {content.contact.content.email && (
+                    <p>
+                        <strong>{content.contact.content.email.label}:</strong>{" "}
+                        <a href={`mailto:${content.contact.content.email.content}`} className="text-green-600 underline">
+                            {content.contact.content.email.content}
+                        </a>
+                    </p>
+                )}
+                {content.contact.content.phone && (
+                    <p>
+                        <strong>{content.contact.content.phone.label}:</strong>{" "}
+                        <a href={`tel:${content.contact.content.phone.content}`} className="text-green-600 underline">
+                            {content.contact.content.phone.content}
+                        </a>
+                    </p>
+                )}
+            </div>
+        </ContentSection>
+
+        
 
       {/* Leistungen */}
-      <ContentSection id="services" title="Unsere Leistungen" className="max-w-3xl mx-auto">
-        <ul className="space-y-4 text-gray-700">
-          {Object.entries(content.services).map(([key, value]) => (
+        <ContentSection id="services" title={`${content.services.label}`} className="max-w-3xl mx-auto">
+             <ul className="space-y-4 text-gray-700">
+          {Object.entries(content.services.content).map(([key, value]) => (
             <li key={key} className="p-4 bg-white rounded-lg shadow">
               <strong>{value.label}</strong> – {value.content}
             </li>
           ))}
         </ul>
-      </ContentSection>
+        </ContentSection>
+      
     
 
      
     </main>
+    {/* Footer */}
+    <Footer />
+    </>
   );
 }

@@ -10,6 +10,7 @@ exports.getContent = (req, res) => {
 };
 
 exports.updateContent = (req, res) => {
+  console.log(req.body);
   const newContent = req.body;
   fs.writeFileSync(contentPath, JSON.stringify(newContent, null, 2), 'utf8');
   res.json({ success: true, message: 'Inhalte aktualisiert' });

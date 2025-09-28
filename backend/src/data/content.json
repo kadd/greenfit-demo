@@ -1,15 +1,59 @@
 {
-  "about": {"label": "Über uns", "content": "GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg."},
+  "title": "GreenFit - Dein Personal Trainer in Hamburg",
+  "metaDescription": "GreenFit bietet individuelles Personal Training, Ernährungsberatung und Gruppenkurse in Hamburg.",
+  "header": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "services": "Leistungen",
+    "contact": "Kontakt",
+    "impressum": "Impressum",
+    "privacy": "Datenschutz",
+    "terms": "AGB"
+  },
+  "about": {
+    "label": "Über uns",
+    "content": "GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg."
+  },
   "services": {
-    "training": {"label": "Personal Training", "content": "Personal Training im Studio oder Outdoor"},
-    "nutrition": {"label": "Ernährungsberatung", "content": "Ernährungsberatung für einen gesunden Lebensstil"},
-    "group": {"label": "Gruppenkurse", "content": "Gruppenkurse für mehr Motivation"}
+    "label": "Unsere Leistungen",
+    "content": {
+      "training": {
+        "label": "Personal Training",
+        "content": "Personal Training im Studio oder Outdoor"
+      },
+      "nutrition": {
+        "label": "Ernährungsberatung",
+        "content": "Ernährungsberatung für einen gesunden Lebensstil"
+      },
+      "group": {
+        "label": "Gruppenkurse",
+        "content": "Gruppenkurse für mehr Motivation"
+      }
+    }
   },
   "contact": {
-    "email": {"label": "E-Mail", "content": "kontakt@greenfit-demo.de"},
-    "phone": {"label": "Telefon", "content": "+49 123 456789"}
+    "label": "Kontaktinformationen",
+    "content": {
+      "email": {
+        "label": "E-Mail",
+        "content": "kontakt@greenfit-demo.de"
+      },
+      "phone": {
+        "label": "Telefon",
+        "content": "+49 123 456789"
+      }
+    }
   },
-  "impressum": {"label": "Impressum", "content": "Impressum: Musterstraße 1, 12345 Musterstadt"},
-  "privacy": {"label": "Datenschutz", "content": "Datenschutz: Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften. Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage genutzt und nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben. Weitere Informationen finden  Sie in unserer Datenschutzerklärung."},
-  "terms": {"label": "AGB", "content": "AGB: Unsere Allgemeinen Geschäftsbedingungen finden Sie hier."}
+  "impressum": {
+    "label": "Impressum",
+    "content": "Impressum: Musterstraße 1, 12345 Musterstadt"
+  },
+  "privacy": {
+    "label": "Datenschutz",
+    "content": "Datenschutz: Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften. Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage genutzt und nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben. Weitere Informationen finden Sie in unserer Datenschutzerklärung."
+  },
+  "terms": {
+    "label": "AGB",
+    "content": "Unsere Allgemeinen Geschäftsbedingungen finden Sie hier."
+  }
 }

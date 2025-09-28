@@ -12,7 +12,7 @@ export default function HamburgerButton({ onClick, isOpen }: Props) {
       onClick={onClick}
       aria-label={isOpen ? "Menü schließen" : "Menü öffnen"}
     >
-     {/* Hamburger-Button für mobiles Menü add md:hidden for mobile view */}
+     {/* Hamburger-Button für mobiles Menü add md:hidden to button class for mobile view */}
       <span className="block w-6 h-0.5 bg-green-700 mb-1"></span>
       <span className="block w-6 h-0.5 bg-green-700 mb-1"></span>
       <span className="block w-6 h-0.5 bg-green-700"></span>
