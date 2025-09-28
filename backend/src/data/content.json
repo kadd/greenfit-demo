@@ -2,15 +2,53 @@
   "title": "GreenFit - Dein Personal Trainer in Hamburg",
   "metaDescription": "GreenFit bietet individuelles Personal Training, Ernährungsberatung und Gruppenkurse in Hamburg.",
   "header": {
-    "home": "Startseite",
-    "about": "Über uns",
-    "services": "Leistungen",
-    "contact": "Kontakt",
-    "impressum": "Impressum",
-    "privacy": "Datenschutz",
-    "terms": "AGB",
-    "faq": "FAQ",
-    "blog": "Blog/News"
+    "logoSrc": "/logo-greenfit.png",
+    "logoAlt": "GreenFit Logo",
+    "tagline": "Dein Personal Trainer in Hamburg",
+    "navigation": {
+      "home": {
+        "label": "Startseite",
+        "href": "/"
+      },
+      "about": {
+        "label": "Über uns",
+        "href": "/#about"
+      },
+      "services": {
+        "label": "Leistungen",
+        "href": "/#services"
+      },
+      "gallery": {
+        "label": "Galerie",
+        "href": "/#gallery"
+      },
+      "contact": {
+        "label": "Kontakt",
+        "href": "/#contact"
+      },
+      "impressum": {
+        "label": "Impressum",
+        "href": "/impressum"
+      },
+      "privacy": {
+        "label": "Datenschutz",
+        "href": "/privacy"
+      },
+      "terms": {
+        "label": "AGB",
+        "href": "/terms"
+      },
+      "faq": {
+        "label": "FAQ",
+        "href": "/faq"
+      },
+      "blog": {
+        "label": "Blog",
+        "href": "/blog"
+      }
+    }
+    
+   
   },
   "about": {
     "label": "Über uns",

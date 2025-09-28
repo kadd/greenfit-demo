@@ -12,7 +12,8 @@ import OverlayMenu from "@/components/Navigation/OverlayMenu";
 import ScrollToTopButton from "@/components/Navigation/ScrollToTopButton";
 
 import ContactForm from "@/components/ui/contact/ContactForm";
-import ContentSection from "@/components/ContentSection";
+import ContentSection from "@/components/ui/ContentSection";
+import GallerySection from "@/components/ui/GallerySection";
 import FaqPage from "@/components/FaqPage";
 
 import Footer from "@/components/Footer";
@@ -124,8 +125,6 @@ export default function Home() {
 
       
           <ContactForm info_message="Schreiben Sie uns – wir melden uns schnellstmöglich zurück!" />
-      
-       
             <div className="text-center text-gray-700 space-y-2">
                 {content.contact.content.email && (
                     <p>
@@ -145,6 +144,11 @@ export default function Home() {
                 )}
             </div>
         </ContentSection>
+
+        <GallerySection id="gallery"
+          images={content.gallery?.images || []}
+          title={content.gallery?.title || "Impressionen"}
+        />
 
         
 

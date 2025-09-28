@@ -2,15 +2,15 @@ export type ContentData = {
   title: string;
   metaDescription: string;
   header: {
-    home: string;
-    about: string;
-    services: string;
-    contact: string;
-    impressum: string;
-    privacy: string;
-    terms: string;
-    faq: string;
-    blog: string;
+    logoSrc?: string;
+    logoAlt?: string;
+   
+    navigation: {
+      [key: string]: {
+        label: string;
+        href: string;
+      };
+    };
   };
   about: { label: string; content: string };
   services: {

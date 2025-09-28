@@ -32,13 +32,17 @@ export default function OverlayMenu({ isAuthenticated, onClose }: Props) {
             <a href="/admin/login" onClick={onClose}>Login</a>
           </li>
         )}
-        {Object.entries(content.header).map(([key, value]) => (
-          <li key={key}>
-            <a href={`#${key}`} onClick={onClose}>
-              {value}
+       {content.header.navigation &&
+          Object.entries(content.header.navigation).map(([key, nav]) => (
+            <a
+              key={key}
+              href={nav.href}
+              className="px-3 py-2 rounded text-white hover:bg-green-800 transition font-semibold"
+            >
+              {nav.label}
             </a>
-          </li>
-        ))}
+          ))
+        }
        
         
       </ul>
