@@ -1,6 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/contact' || "http://localhost:5001/api/contact";
- 
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+  ? process.env.NEXT_PUBLIC_API_URL + '/contact'
+  : "http://localhost:5001/api/contact";
+  
 export async function sendContactForm(data: { name: string; email: string; message: string }) {
   try {
     const res = await fetch(API_URL, {

@@ -2,10 +2,10 @@
 import { useContentContext } from "@/contexts/contentContext";
 import { useEffect, useState } from 'react';
 
-import TermsPage from '@/components/TermsPage';
+import TermsPage from '@/components/Pages/TermsPage';
 
 export default function Page() {
- const content = useContentContext();
+ const {content} = useContentContext();
   if (!content || !content.termsLong) {
     return <div className="p-6 text-center text-gray-500">AGB wird geladen...</div>;
   }

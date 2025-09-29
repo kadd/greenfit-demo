@@ -2,16 +2,12 @@
   "title": "GreenFit - Dein Personal Trainer in Hamburg",
   "metaDescription": "GreenFit bietet individuelles Personal Training, Ernährungsberatung und Gruppenkurse in Hamburg.",
   "header": {
-    "title": "Willkommen bei GreenFit",
-    "subtitle": "Dein Personal Trainer in Hamburg",
-    "cta": "Jetzt Kontakt aufnehmen",
-    "logoSrc": "/logo.png",
+    "logoSrc": "/logo-greenfit.png",
     "logoAlt": "GreenFit Logo",
-    "backgroundImage": "/header-bg.jpg",
-    "backgroundAlt": "Fitness Hintergrund",
+    "tagline": "Dein Personal Trainer in Hamburg",
     "navigation": {
       "home": {
-        "label": "Home",
+        "label": "Startseite",
         "href": "/"
       },
       "about": {
@@ -22,13 +18,9 @@
         "label": "Leistungen",
         "href": "/#services"
       },
-      "team": {
-        "label": "Team",
-        "href": "/#team"
-      },
-      "testimonials": {
-        "label": "Kundenstimmen",
-        "href": "/#testimonials"
+      "gallery": {
+        "label": "Galerie",
+        "href": "/#gallery"
       },
       "contact": {
         "label": "Kontakt",
@@ -38,11 +30,11 @@
         "label": "Impressum",
         "href": "/impressum"
       },
-      "datenschutz": {
+      "privacy": {
         "label": "Datenschutz",
         "href": "/privacy"
       },
-      "agb": {
+      "terms": {
         "label": "AGB",
         "href": "/terms"
       },
@@ -55,6 +47,8 @@
         "href": "/blog"
       }
     }
+    
+   
   },
   "about": {
     "label": "Über uns",
@@ -77,38 +71,6 @@
       }
     }
   },
-  "team": {
-    "label": "Unser Team",
-    "members": [
-      {
-        "name": "Katja Alsleben",
-        "role": "Personal Trainerin",
-        "photoSrc": "/team/katja.jpg",
-        "photoAlt": "Katja Alsleben",
-        "bio": "Expertin für Fitness und Ernährung."
-      },
-      {
-        "name": "Max Mustermann",
-        "role": "Ernährungsberater",
-        "photoSrc": "/team/max.jpg",
-        "photoAlt": "Max Mustermann",
-        "bio": "Spezialist für gesunde Lebensweise."
-      }
-    ]
-  },
-  "testimonials": {
-    "label": "Kundenstimmen",
-    "items": [
-      {
-        "name": "Anna Schmidt",
-        "content": "Dank GreenFit habe ich meine Fitnessziele erreicht!"
-      },
-      {
-        "name": "Peter Müller",
-        "content": "Die Ernährungsberatung hat mein Leben verändert."
-      }
-    ]
-  },
   "contact": {
     "label": "Kontaktinformationen",
     "content": {
@@ -123,7 +85,7 @@
     }
   },
   "impressum": {
-    "label": "Impressum1",
+    "label": "Impressum",
     "content": "Impressum: Musterstraße 1, 12345 Musterstadt"
   },
   "impressumLong": {
@@ -151,36 +113,6 @@
   "privacy": {
     "label": "Datenschutz",
     "content": "Datenschutz: Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften. Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage genutzt und nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben. Weitere Informationen finden Sie in unserer Datenschutzerklärung."
-  },
-  "privacyLong": {
-    "isPage": true,
-    "title": "Datenschutzerklärung",
-    "sections": [
-      {
-        "heading": "1. Verantwortlicher",
-        "text": "Verantwortlicher für die Datenverarbeitung ist GreenFit, Musterstraße 1, 12345 Musterstadt."
-      },
-      {
-        "heading": "2. Erhebung und Verarbeitung personenbezogener Daten",
-        "text": "Wir erheben und verarbeiten personenbezogene Daten nur, soweit dies zur Erfüllung unserer Dienstleistungen erforderlich ist."
-      },
-      {
-        "heading": "3. Nutzung und Weitergabe personenbezogener Daten",
-        "text": "Personenbezogene Daten werden nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben, außer wenn dies zur Vertragserfüllung notwendig ist."
-      },
-      {
-        "heading": "4. Rechte der betroffenen Personen",
-        "text": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer personenbezogenen Daten."
-      },
-      {
-        "heading": "5. Datensicherheit",
-        "text": "Wir treffen angemessene technische und organisatorische Maßnahmen, um Ihre Daten vor Verlust, Missbrauch und unbefugtem Zugriff zu schützen."
-      },
-      {
-        "heading": "6. Änderungen der Datenschutzerklärung",
-        "text": "Wir behalten uns das Recht vor, diese Datenschutzerklärung jederzeit zu ändern. Die aktuelle Version ist stets auf unserer Website verfügbar."
-      }
-    ]
   },
   "terms": {
     "label": "AGB",
@@ -220,7 +152,37 @@
       },
       {
         "heading": "8. Schlussbestimmungen",
-        "text": "Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt......"
+        "text": "Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt."
+      }
+    ]
+  },
+  "privacyLong": {
+    "isPage": true,
+    "title": "Datenschutzerklärung",
+    "sections": [
+      {
+        "heading": "1. Verantwortlicher",
+        "text": "Verantwortlicher für die Datenverarbeitung ist GreenFit, Musterstraße 1, 12345 Musterstadt."
+      },
+      {
+        "heading": "2. Erhebung und Verarbeitung personenbezogener Daten",
+        "text": "Wir erheben und verarbeiten personenbezogene Daten nur, soweit dies zur Erfüllung unserer Dienstleistungen erforderlich ist."
+      },
+      {
+        "heading": "3. Nutzung und Weitergabe personenbezogener Daten",
+        "text": "Personenbezogene Daten werden nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben, außer wenn dies zur Vertragserfüllung notwendig ist."
+      },
+      {
+        "heading": "4. Rechte der betroffenen Personen",
+        "text": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer personenbezogenen Daten."
+      },
+      {
+        "heading": "5. Datensicherheit",
+        "text": "Wir treffen angemessene technische und organisatorische Maßnahmen, um Ihre Daten vor Verlust, Missbrauch und unbefugtem Zugriff zu schützen."
+      },
+      {
+        "heading": "6. Änderungen der Datenschutzerklärung",
+        "text": "Wir behalten uns das Recht vor, diese Datenschutzerklärung jederzeit zu ändern. Die aktuelle Version ist stets auf unserer Website verfügbar."
       }
     ]
   },

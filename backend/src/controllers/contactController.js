@@ -72,7 +72,7 @@ exports.getContactsGroupedByEmail = (req, res) => {
     }
     grouped[contact.email].push(contact);
   });
-
+  console.log("📬 Gruppierte Kontaktanfragen:", grouped);
   res.json(grouped);
 };
 

@@ -10,8 +10,9 @@ import OverlayMenu from "./OverlayMenu";
 
 export default function Menu() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const content = useContentContext();
   const { isAuthenticated } = useAuth();
+  const { content } = useContentContext();
+ 
   const router = useRouter();
 
   useEffect(() => {
@@ -23,11 +24,13 @@ export default function Menu() {
     }
   }, [router.asPath]);
 
+  console.log("Content in Menu:", content);
+
   if (!content) return null;
 
   return (
-    <header className="w-full bg-green-700 shadow-lg fixed top-0 left-0 z-40">
-    <nav className="w-full grid grid-cols-3 items-center px-4 py-3">
+  <header className="w-full bg-green-700 shadow-lg fixed top-0 left-0 z-40">
+    <nav className="grid grid-cols-3 items-center px-4 py-3">
         {/* Logo ganz links */}
         <div className="flex justify-start">
           <a href="/" className="text-2xl font-extrabold text-white tracking-wide hover:underline">
@@ -37,7 +40,7 @@ export default function Menu() {
 
         {/* Navigation mittig */}
         <div className="hidden md:flex justify-center items-center space-x-8">
-          {content.header.navigation &&
+          {content.header?.navigation &&
             Object.entries(content.header.navigation).map(([key, nav]) => (
               nav.href.startsWith("/#") ? (
                 <Link key={key} href={nav.href} scroll={true}>
@@ -54,7 +57,8 @@ export default function Menu() {
                   {nav.label}
                 </a>
               )
-            ))}
+            ))
+          }
         </div>
 
         {/* Dashboard/Login ganz rechts */}
@@ -77,7 +81,7 @@ export default function Menu() {
         </div>
 
         {/* Hamburger für Mobil */}
-        <div className="md:hidden flex items-center col-span-3 justify-end">
+        <div className="md:hidden flex justify-end items-center col-span-3">
           <HamburgerButton onClick={() => setMenuOpen(!menuOpen)} isOpen={menuOpen} />
         </div>
       </nav>

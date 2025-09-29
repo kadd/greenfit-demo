@@ -3,6 +3,7 @@ import BlogEditor from "../ui/blog/BlogEditor";
 export default function BlogTab({ blog, setBlog, handleSave, msg, router }) {
   return (
     <div>
+      
       <button
         type="button"
         onClick={() => router.back()}

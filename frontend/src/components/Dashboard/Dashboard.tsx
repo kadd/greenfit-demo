@@ -20,19 +20,24 @@ import BlogTab from "./BlogTab";
 import TermsTab from "./TermsTab";
 import ImpressumTab from "./ImpressumTab";
 import PrivacyTab from "./PrivacyTab";
+import UploadTab from "./UploadTab";
+import FileUpload from "../ui/common/FileUpload";
+
 
 type Props = {};
 
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
   const [activeTab, setActiveTab] = 
-  useState<"content" | "contacts" | "blog"| "faq" | "terms" 
+  useState<"content" | "upload" | "contacts" | "blog"| "faq" | "terms" 
   | "impressum" | "privacy">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
 
   const { token } = useAuth();
-  const { data, loading, error, updateContentData } = useContent(token || "");
+  const { data, loading, error, updateContentData, getContentDataService,
+    updateBlog, updateFaq, updateTerms, updatePrivacy, updateImpressum
+   } = useContent(token || "");
 
   const { contacts, deleteContact, fetchContactsGroupedByEmail } = useContact();
 
@@ -88,6 +93,7 @@ export default function ContentPage() {
       const result = await updateContentData(content);
       if (result) {
         setMsg("✅ Inhalte gespeichert!");
+       
       } else {
         setMsg("❌ Fehler beim Speichern");
       }
@@ -97,6 +103,127 @@ export default function ContentPage() {
 
    
   };
+
+  const handleSaveFaq = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      if (!token) {
+        router.push("/admin/login");
+        return;
+      }
+      const result = await updateFaq({ faq: content.faq });
+      if (result) {
+        setMsg("✅ FAQ gespeichert!");
+       
+      } else {
+        setMsg("❌ Fehler beim Speichern");
+      }
+    } catch (error) {
+      setMsg("⚠️ Server nicht erreichbar");
+    }
+  }
+
+  const handleSaveTerms = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      if (!token) {
+        router.push("/admin/login");
+        return;
+      }
+      const result = await updateTerms(content.termsLong);
+      if (result) {
+        setMsg("✅ AGB gespeichert!");
+       
+      } else {
+        setMsg("❌ Fehler beim Speichern");
+      }
+    } catch (error) {
+      setMsg("⚠️ Server nicht erreichbar");
+    }
+  }
+
+  const handleSavePrivacy = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      if (!token) {
+        router.push("/admin/login");
+        return;
+      }
+      const result = await updatePrivacy(content.privacyLong);
+      if (result) {
+        setMsg("✅ Datenschutz gespeichert!");
+       
+      } else {
+        setMsg("❌ Fehler beim Speichern");
+      }
+    } catch (error) {
+      setMsg("⚠️ Server nicht erreichbar");
+    }
+  }
+
+  const handleSaveBlog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");  
+    try {
+      if (!token) {
+        router.push("/admin/login");
+        return;
+      }
+      const result = await updateBlog({ blog: content.blog });
+      if (result) {
+        setMsg("✅ Blog gespeichert!");
+       
+      } else {
+        setMsg("❌ Fehler beim Speichern");
+      } 
+    } catch (error) {
+      setMsg("⚠️ Server nicht erreichbar");
+    }
+  };
+
+  const handleSaveImpressum = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      if (!token) {
+        router.push("/admin/login");
+        return;
+      }
+      const result = await updateImpressum(content.impressumLong);
+      if (result) {
+        setMsg("✅ Impressum gespeichert!");
+       
+      } else {
+        setMsg("❌ Fehler beim Speichern");
+      }
+    } catch (error) {
+      setMsg("⚠️ Server nicht erreichbar");
+    }
+  }
+
+  const onUpload = (fileUrl: string) => {
+    // Hier können Sie die Logik zum Aktualisieren des Inhalts mit der neuen Datei-URL implementieren
+    setMsg(`✅ Datei hochgeladen: ${fileUrl}`);
+    
+    // Beispiel: setContent(prev => ({ ...prev, imageUrl: fileUrl }));
+  }
+
+  if (error) {
+    return <p className="p-6">Fehler beim Laden der Inhalte: {error.message}</p>;
+  }
+
+  if (!data) {
+    return <p className="p-6">Keine Inhalte gefunden.</p>;
+  }
+
+ 
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6 w-full">
@@ -121,6 +248,12 @@ export default function ContentPage() {
               onClick={() => setActiveTab("content")}
             >
               Inhalte bearbeiten
+            </button>
+            <button
+              className={`py-2 px-4 font-semibold ${activeTab === "upload" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("upload")}
+            >
+              Uploads
             </button>
             <button
               className={`py-2 px-4 font-semibold ${activeTab === "contacts" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
@@ -173,7 +306,7 @@ export default function ContentPage() {
           <BlogTab
             blog={content.blog}
             setBlog={newBlog => setContent(prev => ({ ...prev, blog: newBlog }))}
-            handleSave={handleSave}
+            handleSave={handleSaveBlog}
             msg={msg}
             router={router}
           />
@@ -182,19 +315,29 @@ export default function ContentPage() {
           <FaqTab
             faq={content.faq}
             setFaq={newFaq => setContent(prev => ({ ...prev, faq: newFaq }))}
-            handleSave={handleSave}
+            handleSave={handleSaveFaq}
             msg={msg}
             router={router}
           />
         )}
+        {activeTab === "upload" && <UploadTab onUpload={onUpload} />}
+        
         {activeTab === "terms" && (
-          <TermsTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} />
+          <TermsTab content={content} 
+          setContent={setContent} 
+          handleSave={handleSaveTerms} msg={msg} />
         )}
         {activeTab === "impressum" && (
-          <ImpressumTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} />
+          <ImpressumTab 
+          content={content} 
+          setContent={setContent} 
+          handleSave={handleSaveImpressum} msg={msg} />
         )}
         {activeTab === "privacy" && (
-          <PrivacyTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} />
+          <PrivacyTab 
+          content={content} 
+          setContent={setContent} 
+          handleSave={handleSavePrivacy} msg={msg} />
         )}
       </div>
       </div>

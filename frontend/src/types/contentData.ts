@@ -2,9 +2,13 @@ export type ContentData = {
   title: string;
   metaDescription: string;
   header: {
+    title: string;
+    subtitle: string;
+    cta: string;
     logoSrc?: string;
     logoAlt?: string;
-   
+    backgroundImage?: string;
+    backgroundAlt?: string;
     navigation: {
       [key: string]: {
         label: string;
@@ -20,6 +24,26 @@ export type ContentData = {
       nutrition: { label: string; content: string };
       group: { label: string; content: string };
   }};
+  team: {
+    label: string;
+    members: Array<{
+      name: string;
+      role: string;
+      bio: string;
+      photoSrc?: string;
+      photoAlt?: string;
+    }>;
+  };
+  testimonials: {
+    label: string;
+    items: Array<{
+      name: string;
+      feedback: string;
+      photoSrc?: string;
+      photoAlt?: string;
+    }>;
+  };
+ 
   contact: {
       label: string;
       content: {

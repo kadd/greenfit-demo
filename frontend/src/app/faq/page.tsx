@@ -1,5 +1,5 @@
 "use client";
-import FaqPage from "@/components/FaqPage";
+import FaqPage from "@/components/Pages/FaqPage";
 import { useContentContext } from "@/contexts/contentContext";
 
 export default function Faq() {

@@ -1,5 +1,6 @@
 import FAQEditor from "../ui/faq/FAQEditor";
 
+
 export default function FaqTab({ faq, setFaq, handleSave, msg, router }) {
   return (
     <div>

@@ -14,9 +14,12 @@ import ScrollToTopButton from "@/components/Navigation/ScrollToTopButton";
 import ContactForm from "@/components/ui/contact/ContactForm";
 import ContentSection from "@/components/ui/ContentSection";
 import GallerySection from "@/components/ui/GallerySection";
-import FaqPage from "@/components/FaqPage";
+import TeamSection from "@/components/ui/TeamSection";
+import TestimonialsSection from "@/components/ui/TestimonialsSection";
 
-import Footer from "@/components/Footer";
+import FaqPage from "@/components/Pages/FaqPage";
+
+import Footer from "@/components/Footer/Footer";
 
 import { getEmptyContentData } from "@/utils/mapCotentData";
 
@@ -114,6 +117,16 @@ export default function Home() {
             <p className="text-gray-700 text-center lg:text-lg">
                 {content.about.content}
             </p>
+        </ContentSection>
+
+        {/* Team */}
+        <ContentSection id="team" title={`${content.team.label}`} className="max-w-5xl mx-auto my-8">
+           <TeamSection team={content.team} />
+        </ContentSection>
+
+        {/* Kundenstimmen */}
+        <ContentSection id="testimonials" title={`${content.testimonials.label}`} className="max-w-4xl mx-auto my-8">
+           <TestimonialsSection testimonials={content.testimonials} />
         </ContentSection>
 
         {/* Kontakt */}

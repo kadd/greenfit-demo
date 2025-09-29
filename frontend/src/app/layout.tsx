@@ -35,11 +35,15 @@ export default function RootLayout({
     <html lang="de">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}>
         <ContentProvider>
+          <Menu />
           {/* Hauptinhalt */}
           <main className="min-h-[80vh] flex flex-col items-center justify-center">
-            <Menu />
+           
             
-            {children}
+            {/* Abstand unter dem festen Menü */}
+              <div className="pt-16 w-full">
+                {children}
+              </div>
           </main>
           
         </ContentProvider>

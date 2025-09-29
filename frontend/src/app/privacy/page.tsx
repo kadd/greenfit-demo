@@ -2,7 +2,7 @@
 import { useContentContext } from "@/contexts/contentContext";
 import { useEffect, useState } from 'react';
 
-import PrivacyPolicyPage from '@/components/PrivacyPage';
+import PrivacyPolicyPage from '@/components/Pages/PrivacyPage';
 
 export default function Page() {
  const content = useContentContext();
