@@ -6,7 +6,7 @@ import { useContent } from "@/hooks/useContent";
 import { useContact } from "@/hooks/useContact";
 
 import { ContentData } from "@/types/contentData";
-import DashboardForm from "@/components/ui/dashboard/DashboardForm";
+import DashboardForm from "@/components/ui/_dashboard/DashboardForm";
 
 import AdminHeader from "@/components/Navigation/admin/AdminHeader";
 import { getEmptyContentData, mapContentData } from "@/utils/mapCotentData";
@@ -22,6 +22,7 @@ import ImpressumTab from "./ImpressumTab";
 import PrivacyTab from "./PrivacyTab";
 import UploadTab from "./UploadTab";
 import TeamTab from "./TeamTab";
+import ServicesTab from "./ServicesTab";
 import FileUpload from "../ui/common/FileUpload";
 
 
@@ -30,7 +31,7 @@ type Props = {};
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
   const [activeTab, setActiveTab] = 
-  useState<"content" | "upload" | "contacts" | "blog"| "faq" | "terms" | "team"
+  useState<"content" | "services" | "upload" | "contacts" | "blog"| "faq" | "terms" | "team"
   | "impressum" | "privacy">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
@@ -251,6 +252,12 @@ export default function ContentPage() {
               Inhalte bearbeiten
             </button>
             <button
+              className={`py-2 px-4 font-semibold ${activeTab === "services" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("services")}
+            >
+              Dienstleistungen verwalten
+            </button>
+            <button
               className={`py-2 px-4 font-semibold ${activeTab === "team" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
               onClick={() => setActiveTab("team")}
             >
@@ -305,6 +312,10 @@ export default function ContentPage() {
        <div>
         {activeTab === "content" && (
           <ContentTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} router={router} />
+        )}
+
+        {activeTab === "services" && (
+          <ServicesTab  handleSave={handleSave} msg={msg} router={router} />
         )}
         {activeTab === "team" && (
           <TeamTab  handleSave={handleSave} msg={msg} router={router} />

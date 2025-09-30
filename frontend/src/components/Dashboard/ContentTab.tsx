@@ -1,4 +1,4 @@
-import DashboardForm from "../ui/dashboard/DashboardForm";
+import ContentForm from "../ui/content/ContentForm";
 
 export default function ContentTab({ content, setContent, handleSave, msg, router }) {
   return (
@@ -13,7 +13,7 @@ export default function ContentTab({ content, setContent, handleSave, msg, route
       <h1 className="text-3xl font-bold text-green-700 mb-6">
         Admin Content
       </h1>
-      <DashboardForm content={content} setContent={setContent} onSubmit={handleSave} />
+      <ContentForm content={content} setContent={setContent} onSubmit={handleSave} />
       {msg && <p className="mt-4">{msg}</p>}
     </div>
   );

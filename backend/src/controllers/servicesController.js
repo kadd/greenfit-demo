@@ -1,10 +1,12 @@
-// GET /api/services
-exports.getServices = (req, res) => {
-  const services = [
-    { id: 1, name: "Personal Training", description: "Individuelles Training im Studio oder Outdoor" },
-    { id: 2, name: "Ernährungsberatung", description: "Maßgeschneiderte Ernährungspläne für deine Ziele" },
-    { id: 3, name: "Gruppenkurse", description: "Motivierendes Training in der Gruppe" },
-  ];
+const path = require("path");
+const fs = require("fs");
 
-  res.json(services);
+exports.getServices = (req, res) => {
+  const filePath = path.join(__dirname, "../data/services.json");
+  if (fs.existsSync(filePath)) {
+    const rawData = fs.readFileSync(filePath);
+    const services = JSON.parse(rawData);
+    return res.json(services);
+  }
+  return res.status(404).json({ message: "services.json not found" });
 };

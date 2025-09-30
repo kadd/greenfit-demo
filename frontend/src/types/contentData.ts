@@ -19,11 +19,12 @@ export type ContentData = {
   about: { label: string; content: string };
   services: {
     label: string;
+    description?: string;
     content: {
-      training: { label: string; content: string };
-      nutrition: { label: string; content: string };
-      group: { label: string; content: string };
-  }};
+      training: { label: string; content: string; image?: string };
+      nutrition: { label: string; content: string; image?: string };
+      group: { label: string; content: string; image?: string };
+    };
   team: {
     label: string;
     members: Array<{

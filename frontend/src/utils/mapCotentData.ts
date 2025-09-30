@@ -17,10 +17,11 @@ export function getEmptyContentData(): ContentData {
     about: { label: "", content: "" },
     services: {
       label: "",
+      description: "",
       content: {
-        training: { label: "", content: "" },
-        nutrition: { label: "", content: "" },
-        group: { label: "", content: "" },
+        training: { label: "", content: "", image: "" },
+        nutrition: { label: "", content: "", image: "" },
+        group: { label: "", content: "", image: "" },
       },
     },
     team: { label: "", members: [] },
@@ -76,10 +77,11 @@ export function mapContentData(data: any): ContentData {
     },
     services: {
       label: data?.services?.label || "",
+      description: data?.services?.description || "",
       content: {
-        training: data?.services?.content?.training || "",
-        nutrition: data?.services?.content?.nutrition || "",
-        group: data?.services?.content?.group || "",
+        training: { label: data?.services?.content?.training?.label || "", content: data?.services?.content?.training?.content || "", image: data?.services?.content?.training?.image || "" },
+        nutrition: { label: data?.services?.content?.nutrition?.label || "", content: data?.services?.content?.nutrition?.content || "", image: data?.services?.content?.nutrition?.image || "" },
+        group: { label: data?.services?.content?.group?.label || "", content: data?.services?.content?.group?.content || "", image: data?.services?.content?.group?.image || "" },
       },
     },
     team: {

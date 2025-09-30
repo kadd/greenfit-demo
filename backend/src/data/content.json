@@ -62,18 +62,22 @@
   },
   "services": {
     "label": "Unsere Leistungen",
+    "description": "Wir bieten eine Vielzahl von Fitness- und Ernährungsdienstleistungen an.",
     "content": {
       "training": {
         "label": "Personal Training",
-        "content": "Personal Training im Studio oder Outdoor"
+        "content": "Personal Training im Studio oder Outdoor",
+        "image": "/uploads/services/training.jpg"
       },
       "nutrition": {
         "label": "Ernährungsberatung",
-        "content": "Ernährungsberatung für einen gesunden Lebensstil"
+        "content": "Ernährungsberatung für einen gesunden Lebensstil",
+        "image": "/uploads/services/nutrition.jpg"
       },
       "group": {
         "label": "Gruppenkurse",
-        "content": "Gruppenkurse für mehr Motivation"
+        "content": "Gruppenkurse für mehr Motivation",
+        "image": "/uploads/services/group.jpg"
       }
     }
   },
@@ -123,7 +127,7 @@
     }
   },
   "impressum": {
-    "label": "Impressum1",
+    "label": "Impressum",
     "content": "Impressum: Musterstraße 1, 12345 Musterstadt"
   },
   "impressumLong": {
