@@ -1,3 +1,5 @@
+import { Service } from "./service";
+
 export type ContentData = {
   title: string;
   metaDescription: string;
@@ -25,6 +27,7 @@ export type ContentData = {
       nutrition: { label: string; content: string; image?: string };
       group: { label: string; content: string; image?: string };
     };
+  };
   team: {
     label: string;
     members: Array<{

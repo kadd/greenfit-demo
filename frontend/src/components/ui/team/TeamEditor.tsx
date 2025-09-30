@@ -12,6 +12,8 @@ export default function TeamEditor() {
   const { members, loading, msg, setMsg, updateMember, uploadPhoto } = useTeam(token);
   const [editMembers, setEditMembers] = useState(members);
 
+  const uploadFolder = "team";
+
   useEffect(() => {
     setEditMembers(members);
   }, [members]);
@@ -42,7 +44,7 @@ export default function TeamEditor() {
         {editMembers.map((member: Member, idx) => (
           <div key={member.name || idx} className="bg-white rounded-lg p-4 flex flex-col items-center shadow">
             <img
-              src={getPhotoUrl(member.photoSrc)}
+              src={getPhotoUrl(uploadFolder, member.photoSrc)}
               alt={member.name}
               className="w-24 h-24 rounded-full mb-2 object-cover"
             />

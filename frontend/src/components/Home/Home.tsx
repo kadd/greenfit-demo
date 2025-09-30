@@ -4,8 +4,10 @@ import { useContact } from "@/hooks/useContact";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useContent } from "@/hooks/useContent";
+import { useServices } from "@/hooks/useServices";
 
 import { ContentData } from "@/types/contentData";
+import { ServiceData } from "@/types/service";
 
 import HamburgerButton from "@/components/Navigation/HamburgerButton";
 import OverlayMenu from "@/components/Navigation/OverlayMenu";
@@ -16,12 +18,11 @@ import ContentSection from "@/components/ui/ContentSection";
 import GallerySection from "@/components/ui/GallerySection";
 import TeamSection from "@/components/ui/TeamSection";
 import TestimonialsSection from "@/components/ui/TestimonialsSection";
-
 import FaqPage from "@/components/Pages/FaqPage";
-
 import Footer from "@/components/Footer/Footer";
 
 import { getEmptyContentData } from "@/utils/mapCotentData";
+import { getPhotoUrl } from "@/utils/uploads";
 
 import Image from "next/image";
 
@@ -30,11 +31,13 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
+  
 
   const [msg, setMsg] = useState("");
 
   const { isAuthenticated } = useAuth();
   const { data, loading, error } = useContent("");
+  const { services, updateService, uploadImage,  } = useServices();
 
   // Zustand für Sichtbarkeit des Buttons
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -166,12 +169,14 @@ export default function Home() {
         
 
       {/* Leistungen */}
-       <ContentSection id="services" title={content.services.label} className="max-w-4xl mx-auto my-8">
+       <ContentSection id="services" title={services.label} className="max-w-4xl mx-auto my-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Object.entries(content.services.content).map(([key, value]) => (
+          
+          {Object.entries(services.content).map(([key, value]) => (
             <div key={key} className="p-6 bg-white rounded-lg shadow flex flex-col items-center">
               {/* Optional: Icon */}
               {/* <Image src={`/icons/${key}.svg`} alt={value.label} width={48} height={48} className="mb-2" /> */}
+              <img src={getPhotoUrl('services', value.image)} alt={value.label} width={48} height={48} className="mb-2" />
               <strong className="text-green-700 text-xl mb-2">{value.label}</strong>
               <span className="text-gray-700 text-center">{value.content}</span>
             </div>

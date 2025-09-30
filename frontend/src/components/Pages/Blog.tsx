@@ -1,8 +1,14 @@
 "use client";
-import { useContentContext } from "@/contexts/contentContext";
+import { useContent } from "@/hooks/useContent";
 
 export default function Blog() {
-  const content = useContentContext();
+  const { data: content, loading, error } = useContent();
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Blog wird geladen...</div>;
+  }
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Fehler beim Laden des Blogs</div>;
+  }
   if (!content || !content.blog) {
     return <div className="p-6 text-center text-gray-500">Blog wird geladen...</div>;
   }

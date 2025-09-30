@@ -8,6 +8,7 @@ import ContentInput from "../_dashboard/ContentInput";
 // ServiceEditor.tsx
 export default function ServiceEditor() {
   const { services, updateService, uploadImage } = useServices();
+  
   if (!services || !services.content) return <div>Lade Dienstleistungen...</div>;
 
   return (
@@ -39,9 +40,10 @@ export default function ServiceEditor() {
           />
           <ImageInput
             image={service.image}
+            folder="services"
             onChange={img => updateService(key, { ...service, image: img })}
-            onUpload={file => uploadImage(key, file)}
-          />
+            onUpload={file => uploadImage(key, file)} // <-- Hier wird die Funktion übergeben!
+            />
         </div>
       ))}
     </section>

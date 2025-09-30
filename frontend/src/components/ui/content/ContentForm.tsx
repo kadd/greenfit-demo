@@ -57,6 +57,7 @@ export default function ContentForm({ content, setContent, onSubmit }: Props) {
                       <ContentWithImageField
                         key={subKey}
                         field={subValue}
+                        imageFolder={key}
                         onLabelChange={label =>
                           setContent(prev => ({
                             ...prev,

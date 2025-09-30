@@ -1,12 +1,15 @@
 import React, { useRef } from "react";
 
+import { getPhotoUrl } from "@/utils/uploads";
+
 type Props = {
   image: string;
+  folder: string;
   onChange: (value: string) => void;
   onUpload?: (file: File) => Promise<string>;
 };
 
-export default function ImageInput({ image, onChange, onUpload }: Props) {
+export default function ImageInput({ image, folder, onChange, onUpload }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +24,7 @@ export default function ImageInput({ image, onChange, onUpload }: Props) {
     <div className="flex gap-4 items-center">
       <input
         type="text"
-        value={image}
+        value={image ?? ""}
         onChange={e => onChange(e.target.value)}
         className="font-semibold mb-1 text-gray-700 w-full border rounded p-2"
         placeholder="Image URL"
@@ -38,7 +41,7 @@ export default function ImageInput({ image, onChange, onUpload }: Props) {
       </label>
       {image && (
         <img
-          src={image}
+          src={getPhotoUrl(folder, image)}
           alt="Vorschau"
           className="w-12 h-12 object-cover rounded shadow border"
         />

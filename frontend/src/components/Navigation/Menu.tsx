@@ -30,7 +30,7 @@ export default function Menu() {
 
   return (
   <header className="w-full bg-green-700 shadow-lg fixed top-0 left-0 z-40">
-    <nav className="grid grid-cols-3 items-center px-4 py-3">
+    <nav className="grid grid-cols-[auto,1fr,auto] items-center px-4 py-3">
         {/* Logo ganz links */}
         <div className="flex justify-start">
           <a href="/" className="text-2xl font-extrabold text-white tracking-wide hover:underline">

@@ -13,6 +13,7 @@ interface TeamSectionProps {
 
 export default function TeamSection({ team }: TeamSectionProps) {
   const token = process.env.NEXT_PUBLIC_API_TOKEN || "";
+  const uploadFolder = "team";
 
   const { members, getMembers, loading } = useTeam(token);
 
@@ -28,7 +29,7 @@ export default function TeamSection({ team }: TeamSectionProps) {
             <div key={idx} className="bg-gray-100 rounded-lg p-6 flex flex-col items-center shadow">
               {member.photoSrc && (
                 <img
-                  src={getPhotoUrl(member.photoSrc)}
+                  src={getPhotoUrl(uploadFolder, member.photoSrc)}
                   alt={member.name}
                   className="w-24 h-24 rounded-full mb-4 object-cover"
                 />

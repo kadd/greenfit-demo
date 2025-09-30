@@ -28,7 +28,7 @@ export async function uploadServiceImageService(token: string, serviceKey: strin
   formData.append("image", file);
   formData.append("serviceKey", serviceKey);
 
-  const res = await fetch(`${API_URL}/upload-image`, {
+  const res = await fetch(`${API_URL}/upload-image/${serviceKey}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
