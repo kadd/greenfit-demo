@@ -8,7 +8,6 @@ import Gallery from "@/components/ui/gallery/Gallery";
 import { get } from "http";
 
 const uploadAreas: UploadArea[] = [
-  { key: "team", label: "Team-Fotos" },
   { key: "gallery", label: "Galerie" },
   { key: "header", label: "Header-Bild" },
   { key: "other", label: "Sonstige Dateien" },
@@ -82,33 +81,6 @@ const handleUploadDirect = async (areaKey: string, file: File) => {
     <section className="py-8">
       <div className="mt-12 space-y-8">
         {areasArray.map(area => (
-          area.key === "team" && area.members && Array.isArray(area.members) ? (
-            <div className="w-full grid md:grid-cols-2 gap-6">
-              {area.members.map((member, idx) => (
-                <div key={member.name || idx} className="bg-white rounded-lg p-4 flex flex-col items-center shadow">
-                  <img
-                    src={member.image ? `/uploads/team/${member.image}` : "/placeholder.png"}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mb-2 object-cover"
-                  />
-                  <span className="font-semibold">{member.name}</span>
-                  <span className="text-green-700 text-sm mb-2">{member.role}</span>
-                  <label className="cursor-pointer bg-green-700 text-white px-3 py-1 rounded font-semibold hover:bg-green-800 transition mt-2">
-                    Foto hochladen
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={e => {
-                        if (e.target.files && e.target.files[0]) {
-                          handleUploadDirect(`team_${member.name}`, e.target.files[0]);
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
-              ))}
-            </div>
-          ) : (
           <div
             key={area.key}
             className="w-full min-h-[120px] bg-gray-100 rounded-lg flex flex-col items-center justify-center text-gray-400 text-xl border border-dashed p-8"
@@ -132,7 +104,7 @@ const handleUploadDirect = async (areaKey: string, file: File) => {
               </label>
             </div>
           </div>)
-        ))}
+        )}
       </div>
       {msg && <p className="mt-4 text-center">{msg}</p>}
     </section>

@@ -49,7 +49,7 @@ router.get("/list/:area", (req, res) => {
 // zeige alle Upload-Bereiche an
 router.get("/areas", (req, res) => {
   const areas = [
-    { key: "team", label: "Team-Fotos", files: [] },
+   // { key: "team", label: "Team-Fotos", files: [] },
     { key: "gallery", label: "Galerie", files: [] },
     { key: "header", label: "Header-Bild", files: [] },
     { key: "other", label: "Sonstige Dateien", files: [] },

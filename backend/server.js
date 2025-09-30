@@ -20,6 +20,7 @@ const authRoutes = require("./src/routes/auth");
 const adminRoute = require("./src/routes/admin");
 const contentRoute = require("./src/routes/content");
 const uploadRoute = require("./src/routes/upload");
+const teamRoute = require("./src/routes/team");
 
 // Upload Route (ohne Prefix, da spezifische Pfade)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -31,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoute);
 app.use("/api/content", contentRoute);
 app.use("/api/upload", uploadRoute);
+app.use("/api/team", teamRoute);
 
 // Root-Route
 app.get("/", (req, res) => {

@@ -21,6 +21,7 @@ import TermsTab from "./TermsTab";
 import ImpressumTab from "./ImpressumTab";
 import PrivacyTab from "./PrivacyTab";
 import UploadTab from "./UploadTab";
+import TeamTab from "./TeamTab";
 import FileUpload from "../ui/common/FileUpload";
 
 
@@ -29,7 +30,7 @@ type Props = {};
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
   const [activeTab, setActiveTab] = 
-  useState<"content" | "upload" | "contacts" | "blog"| "faq" | "terms" 
+  useState<"content" | "upload" | "contacts" | "blog"| "faq" | "terms" | "team"
   | "impressum" | "privacy">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
@@ -250,6 +251,12 @@ export default function ContentPage() {
               Inhalte bearbeiten
             </button>
             <button
+              className={`py-2 px-4 font-semibold ${activeTab === "team" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("team")}
+            >
+              Team verwalten
+            </button>
+            <button
               className={`py-2 px-4 font-semibold ${activeTab === "upload" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
               onClick={() => setActiveTab("upload")}
             >
@@ -298,6 +305,9 @@ export default function ContentPage() {
        <div>
         {activeTab === "content" && (
           <ContentTab content={content} setContent={setContent} handleSave={handleSave} msg={msg} router={router} />
+        )}
+        {activeTab === "team" && (
+          <TeamTab  handleSave={handleSave} msg={msg} router={router} />
         )}
         {activeTab === "contacts" && (
           <ContactTab contacts={contacts} onDelete={onDelete} />
