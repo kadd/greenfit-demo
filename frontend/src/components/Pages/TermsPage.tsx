@@ -1,15 +1,26 @@
 "use client";
 
-type Section = {
-  heading: string;
-  text: string;
-};
+import { useTerms } from "@/hooks/useTerms";
 
-type Props = {
-  sections?: Section[];
-};
+export default function TermsPage() {
+  const { terms, loading, error } = useTerms();
+  const sections = terms?.sections || [];
 
-export default function TermsPage({ sections }: Props) {
+  if (loading) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+        <div className="text-gray-500">Lade AGB...</div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+        <div className="text-red-500">Fehler: {error}</div>
+      </main>
+    );
+  }
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-4 pt-24">
       <section className="max-w-3xl w-full bg-white p-8 rounded-xl shadow-lg">

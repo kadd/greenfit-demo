@@ -1,16 +1,29 @@
 "use client";
 import React from "react";
 
-type Section = {
-  heading: string;
-  text: string;
-};
+import { Impressum } from "@/types/impressum";
+import { useImpressum } from "@/hooks/useImpressum";
 
 type Props = {
-  sections?: Section[];
+  impressum?: Impressum;
 };
 
-export default function ImpressumPage({ sections }: Props) {
+export default function ImpressumPage({ impressum }: Props) {
+  const { impressum: impressumData, loading, error } = useImpressum();
+  const sections = impressum?.sections || impressumData?.sections;
+  const { title, description } = impressum || impressumData || {};
+
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Impressum wird geladen...</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Fehler: {error}</div>;
+  }
+
+  if (!sections || sections.length === 0) {
+    return <div className="p-6 text-center text-gray-500">Kein Impressum hinterlegt.</div>;
+  }
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-4 pt-24">
       <section className="max-w-3xl w-full bg-white p-8 rounded-xl shadow-lg">

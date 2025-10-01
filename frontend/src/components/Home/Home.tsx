@@ -37,8 +37,10 @@ export default function Home() {
 
   const { isAuthenticated } = useAuth();
   const { data, loading, error } = useContent("");
-  const { services, updateService, uploadImage,  } = useServices();
 
+  const emptyServices: ServiceData = { label: "", description: "", content: {} };
+  const { services = emptyServices } = useServices();
+  
   // Zustand für Sichtbarkeit des Buttons
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -64,6 +66,15 @@ export default function Home() {
     }
   }, [data, loading, error]);
 
+    useEffect(() => {
+      if (window.location.hash) {
+        const el = document.getElementById(window.location.hash.substring(1));
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }, []);
+
 
   // Scroll-Event Listener für Button
    useEffect(() => {
@@ -77,6 +88,20 @@ export default function Home() {
   if (loading) {
     return <p className="p-6">Lade Inhalte...</p>;
   }
+
+  if (error) {
+    return <p className="p-6 text-red-500">Fehler beim Laden der Inhalte: {error}</p>;
+  }
+
+  if (!content) {
+    return <p className="p-6 text-red-500">Keine Inhalte verfügbar.</p>;
+  }
+
+  if (!services || !services.content || Object.keys(services.content).length === 0) {
+    return <p className="p-6 text-red-500">Keine Leistungsdaten verfügbar.</p>;
+  }
+
+  // Funktion zum Scrollen nach oben
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });

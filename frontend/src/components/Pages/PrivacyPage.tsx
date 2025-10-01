@@ -1,17 +1,30 @@
 "use client";
 import React from "react";
 
-type Section = {
-  heading: string;
-  text: string;
-};
+import { Privacy } from "@/types/privacy";
+import { usePrivacy } from "@/hooks/usePrivacy";
 
 type Props = {
-  sections?: Section[];
   message?: string;
 };
 
-export default function PrivacyPolicyPage({ sections, message }: Props) {
+export default function PrivacyPolicyPage({ message }: Props) {
+  const { privacy, loading, error } = usePrivacy();
+
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Datenschutz wird geladen...</div>;
+  }
+
+  if (!privacy) {
+    return <div className="p-6 text-center text-gray-500">Keine Datenschutzbestimmungen verfügbar.</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Fehler: {error}</div>;
+  }
+
+  const sections = privacy.sections;
+  const { title, description } = privacy;
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-4 pt-24">
       <section className="max-w-3xl w-full bg-white p-8 rounded-xl shadow-lg">

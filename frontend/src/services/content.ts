@@ -1,6 +1,12 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL+'/content' || "http://localhost:5001/api/content";
 
 export async function getContentData(token?: string) {
+  // ohne Token, wenn öffentlich zugänglich
+  if (!token) {
+    const res = await fetch(`${API_URL}`);
+    if (!res.ok) throw new Error("Failed to fetch content data");
+    return res.json();
+  }
   const res = await fetch(`${API_URL}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

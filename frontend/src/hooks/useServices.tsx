@@ -1,6 +1,8 @@
 import React from "react";
 import { UploadArea } from "@/types/uploadArea";
 
+import { ServiceData } from "@/types/services";
+
 // Beispiel-Services, bitte anpassen!
  import { getServicesDataService, 
     updateServicesDataService, 
@@ -8,8 +10,8 @@ import { UploadArea } from "@/types/uploadArea";
 import { get } from "http";
 
 export function useServices() {
-  const [services, setServices] = React.useState({});
-    const [loading, setLoading] = React.useState(false);
+  const [services, setServices] = React.useState<ServiceData | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     console.log("useEffect läuft");

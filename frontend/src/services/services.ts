@@ -3,6 +3,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
   : "http://localhost:5001/api/services";
 
 export async function getServicesDataService(token?: string) {
+  // ohne Token, wenn öffentlich zugänglich
+  if (!token) {
+    const res = await fetch(`${API_URL}`);
+    if (!res.ok) throw new Error("Failed to fetch services data");
+    return res.json();
+  }
   const res = await fetch(`${API_URL}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

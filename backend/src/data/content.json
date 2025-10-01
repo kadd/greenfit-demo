@@ -133,6 +133,7 @@
   "impressumLong": {
     "isPage": true,
     "title": "Impressum",
+    "description": "Hier finden Sie unser Impressum.",
     "sections": [
       {
         "heading": "Angaben gemäß § 5 TMG",
@@ -159,6 +160,7 @@
   "privacyLong": {
     "isPage": true,
     "title": "Datenschutzerklärung",
+    "description": "Hier finden Sie unsere Datenschutzerklärung.",
     "sections": [
       {
         "heading": "1. Verantwortlicher",

@@ -19,7 +19,7 @@ export function useContent(token?: string) {
     const fetchContentData = async () => {
       setLoading(true);
       try {
-        const result = await getContentDataService(token);
+        const result = await getContentDataService();
         setData(result);
       } catch (err) {
         setError(err);
