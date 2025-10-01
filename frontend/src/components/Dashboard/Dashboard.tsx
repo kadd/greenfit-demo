@@ -169,25 +169,7 @@ export default function ContentPage() {
     }
   }
 
-  const handleSaveBlog = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");  
-    try {
-      if (!token) {
-        router.push("/admin/login");
-        return;
-      }
-      const result = await updateBlog({ blog: content.blog });
-      if (result) {
-        setMsg("✅ Blog gespeichert!");
-       
-      } else {
-        setMsg("❌ Fehler beim Speichern");
-      } 
-    } catch (error) {
-      setMsg("⚠️ Server nicht erreichbar");
-    }
-  };
+  
 
   const handleSaveImpressum = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -325,9 +307,6 @@ export default function ContentPage() {
         )}
         {activeTab === "blog" && (
           <BlogTab
-            blog={content.blog}
-            setBlog={newBlog => setContent(prev => ({ ...prev, blog: newBlog }))}
-            handleSave={handleSaveBlog}
             msg={msg}
             router={router}
           />

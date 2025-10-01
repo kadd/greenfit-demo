@@ -250,11 +250,13 @@
     "description": "Bleiben Sie auf dem Laufenden mit unseren neuesten Beiträgen und Tipps zu Fitness und Gesundheit.",
     "items": [
       {
+        "id": "1",
         "title": "Neueröffnung unseres Studios",
         "date": "2023-01-15",
         "excerpt": "Wir freuen uns, die Eröffnung unseres neuen Studios in Hamburg bekannt zu geben."
       },
       {
+        "id": "2",
         "title": "Tipps für ein gesundes Frühstück",
         "date": "2023-02-10",
         "excerpt": "Ein gesundes Frühstück ist der Schlüssel zu einem erfolgreichen Tag. Hier sind einige Tipps."
