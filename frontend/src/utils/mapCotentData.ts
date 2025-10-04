@@ -15,15 +15,7 @@ export function getEmptyContentData(): ContentData {
         navigation: {},
     },
     about: { label: "", content: "" },
-    services: {
-      label: "",
-      description: "",
-      content: {
-        training: { label: "", content: "", image: "" },
-        nutrition: { label: "", content: "", image: "" },
-        group: { label: "", content: "", image: "" },
-      },
-    },
+    
     team: { label: "", members: [] },
     testimonials: { label: "", items: [] },
     contact: {
@@ -34,25 +26,12 @@ export function getEmptyContentData(): ContentData {
       },
     },
     impressum: { label: "", content: "" },
-    impressumLong: { 
-        isPage: false,
-        title: "",
-        sections: [] 
-    },
+    
     privacy: { label: "", content: "" },
-    privacyLong: { 
-        isPage: false,
-        title: "",
-        sections: [] 
-    },
+    
     terms: { label: "", content: "" },
-    termsLong: { 
-        isPage: false,
-        title: "",
-        sections: [] 
-    },
-    faq: { title: "", items: [], isPage: true },
-    blog: { title: "", description: "", items: [], isPage: true },
+    
+   
 
   };
 }
@@ -75,15 +54,7 @@ export function mapContentData(data: any): ContentData {
       label: data?.about?.label || "",
       content: data?.about?.content || "",
     },
-    services: {
-      label: data?.services?.label || "",
-      description: data?.services?.description || "",
-      content: {
-        training: { label: data?.services?.content?.training?.label || "", content: data?.services?.content?.training?.content || "", image: data?.services?.content?.training?.image || "" },
-        nutrition: { label: data?.services?.content?.nutrition?.label || "", content: data?.services?.content?.nutrition?.content || "", image: data?.services?.content?.nutrition?.image || "" },
-        group: { label: data?.services?.content?.group?.label || "", content: data?.services?.content?.group?.content || "", image: data?.services?.content?.group?.image || "" },
-      },
-    },
+    
     team: {
       label: data?.team?.label || "",
       members: Array.isArray(data?.team?.members) ? data.team.members : [],
@@ -109,39 +80,17 @@ export function mapContentData(data: any): ContentData {
       label: data?.impressum?.label || "",
       content: data?.impressum?.content || "",
     },
-    impressumLong: {
-      isPage: data?.impressumLong?.isPage || false,
-      title: data?.impressumLong?.title || "",
-      sections: Array.isArray(data?.impressumLong?.sections) ? data.impressumLong.sections : [],
-    },
+    
     privacy: {
       label: data?.privacy?.label || "",
       content: data?.privacy?.content || "",
     },
-    privacyLong: {
-      isPage: data?.privacyLong?.isPage || false,
-      title: data?.privacyLong?.title || "",
-      sections: Array.isArray(data?.privacyLong?.sections) ? data.privacyLong.sections : [],
-    },
+    
     terms: {
       label: data?.terms?.label || "",
       content: data?.terms?.content || "",
     },
-    termsLong: {
-    isPage: data?.termsLong?.isPage || false,
-      title: data?.termsLong?.title || "",
-      sections: Array.isArray(data?.termsLong?.sections) ? data.termsLong.sections : [],
-    },
-    faq: {
-      isPage: data?.faq?.isPage || false,
-      title: data?.faq?.title || "",
-      items: Array.isArray(data?.faq?.items) ? data.faq.items : [],
-    },
-    blog: {
-        isPage: data?.blog?.isPage || false,
-        title: data?.blog?.title || "",
-        description: data?.blog?.description || "",
-        items: Array.isArray(data?.blog?.items) ? data.blog.items : [],
-        },
+    
+   
   };
 }

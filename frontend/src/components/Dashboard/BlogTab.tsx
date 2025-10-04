@@ -5,40 +5,27 @@ import { Blog } from "@/types/blog";
 import { useBlog } from "@/hooks/useBlog";
 
 export default function BlogTab({  router }) {
- 
-  const { blog,  setBlog ,  
-    createNewPost, 
+
+  const { loading, error, blog,  setBlog ,
+    createNewPost,
     updateExistingBlog,
     updateExistingPost, 
     deleteExistingPost } = useBlog();
   const [msg, setMsg] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (blog) {
+    if (blog ) {
         setBlog(blog);
     }
     }, [blog]);
 
+  if (error) {
+    return <p>Fehler beim Laden des Blogs: {error}</p>;
+  }
 
-  // Beispiel für das Speichern:
-  const handleSaveBlog = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");  
-    try {
-      if (!token) {
-        router.push("/admin/login");
-        return;
-      }
-      const result = await updateExistingBlog(token, blog.id, blog);
-      if (result) {
-        setMsg("✅ Blog gespeichert!");
-      } else {
-        setMsg("❌ Fehler beim Speichern");
-      } 
-    } catch (error) {
-      setMsg("⚠️ Server nicht erreichbar");
-    }
-  };
+  if (loading) {
+    return <p>Blog wird geladen...</p>;
+  }
 
   if (!blog) {
     return <p>Keine Blog-Daten verfügbar.</p>;
@@ -61,6 +48,8 @@ export default function BlogTab({  router }) {
       <BlogEditor 
         blog={blog} 
         setBlog={setBlog} 
+        loading={loading}
+        error={error}
         updateExistingBlog={updateExistingBlog}
         createNewPost={createNewPost} 
         updateExistingPost={updateExistingPost} 

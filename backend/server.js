@@ -38,7 +38,7 @@ app.use("/api/admin", adminRoute);
 app.use("/api/content", contentRoute);
 app.use("/api/upload", uploadRoute);
 app.use("/api/team", teamRoute);
-app.use("/api/faqs", faqRoute);
+app.use("/api/faq", faqRoute);
 app.use("/api/blog", blogRoute);
 app.use("/api/terms", termsRoute);
 app.use("/api/privacy", privacyRoute);

@@ -7,29 +7,26 @@ import { useAuth } from "@/hooks/useAuth";
 interface BlogEditorProps {
   blog: Blog;
   setBlog: (blog: Blog) => void;
-  createNewPost: (post: BlogItem) => Promise<void>;
-  updateExistingBlog: (blog: Blog) => Promise<void>;
-  updateExistingPost: (id: string, post: Partial<BlogItem>) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+  createNewPost: (token: string, post: BlogItem) => Promise<BlogItem | undefined>;
+  updateExistingBlog: (token: string, blog: Blog) => Promise<Blog | undefined>;
+  updateExistingPost: (token: string, id: string, post: Partial<BlogItem>) => Promise<BlogItem | undefined>;
   deleteExistingPost: (token: string, id: string) => Promise<void>;
   
 }
 
-
-
 export default function BlogEditor({ 
   blog, 
   setBlog, 
+  loading, 
+  error,
   createNewPost, 
   updateExistingBlog,
   updateExistingPost, 
   deleteExistingPost,
  
 }: BlogEditorProps) {
-  const { loading, error, 
-      deleteExistingPostById, updateExistingPostById,
-      addNewEmptyItemWithId, addNewEmptyItemWithoutId
-
-   } = useBlog();
 
   const { isAuthenticated } = useAuth();
   const [msg, setMsg] = React.useState<string | null>(null);
@@ -65,17 +62,39 @@ export default function BlogEditor({
   
   // Gesamten Blog speichern
   const handleSaveBlog = async () => {
+
     if (!isAuthenticated) {
       setMsg("Nicht authentifiziert. Bitte einloggen.");
       return;
     }
     try {
-      await updateExistingBlog(blog);
+      
+ 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setMsg("Kein Auth-Token gefunden. Bitte einloggen.");
+        return;
+      }
+      if (!blog.id) {
+        setMsg("Blog ID fehlt.");
+        return;
+      }
+
+      // Gesamten Blog aktualisieren
+      await updateExistingBlog(token, { id: blog.id, title: blog.title, description: blog.description, items: blog.items } as Partial<Blog>);
+    
       setMsg("✅ Blog gespeichert!");
     } catch (error) {
       setMsg("❌ Fehler beim Speichern");
     }
   };
+
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">Blog wird geladen...</div>;
+  }
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Fehler beim Laden des Blogs</div>;
+  }
 
   if (!blog || !blog.items) {
     return <div className="p-6 text-center text-gray-500">Keine Blogs gefunden</div>;

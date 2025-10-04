@@ -60,27 +60,7 @@
     "label": "Über uns",
     "content": "GreenFit bietet seit über 10 Jahren individuelles Personal Training in Hamburg."
   },
-  "services": {
-    "label": "Unsere Leistungen",
-    "description": "Wir bieten eine Vielzahl von Fitness- und Ernährungsdienstleistungen an.",
-    "content": {
-      "training": {
-        "label": "Personal Training",
-        "content": "Personal Training im Studio oder Outdoor",
-        "image": "/uploads/services/training.jpg"
-      },
-      "nutrition": {
-        "label": "Ernährungsberatung",
-        "content": "Ernährungsberatung für einen gesunden Lebensstil",
-        "image": "/uploads/services/nutrition.jpg"
-      },
-      "group": {
-        "label": "Gruppenkurse",
-        "content": "Gruppenkurse für mehr Motivation",
-        "image": "/uploads/services/group.jpg"
-      }
-    }
-  },
+  
   "team": {
     "label": "Unser Team",
     "members": [

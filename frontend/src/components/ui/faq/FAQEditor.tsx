@@ -1,12 +1,57 @@
 import React from "react";
 
-export default function FAQEditor({ faq, setFaq }) {
-  const handleChange = (idx, field, value) => {
+import { FAQ, FAQItem } from "@/types/faq";
+
+import { useFAQ } from "@/hooks/useFAQ";
+import { useAuth } from "@/hooks/useAuth";
+
+
+
+interface FAQEditorProps {
+  faq: FAQ;
+  setFaq: (faq: FAQ) => void;
+  loading: boolean;
+  error: string | null;
+  createNewFAQItem: (token: string, itemData: FAQItem) => Promise<FAQItem | undefined>;
+  updateExistingFAQ: (token: string, faqData: Partial<FAQ>) => Promise<FAQ | undefined>;
+  updateExistingFAQItem: (token: string, itemId: string, itemData: Partial<FAQItem>) => Promise<FAQItem | undefined>;
+  deleteExistingFAQItem: (token: string, itemId: string) => Promise<void>;
+}
+
+export default function FAQEditor({ 
+  faq, 
+  setFaq, 
+  loading, 
+  error, 
+  createNewFAQItem, 
+  updateExistingFAQ, 
+  updateExistingFAQItem, 
+  deleteExistingFAQItem }: FAQEditorProps) {
+
+  const { isAuthenticated } = useAuth();
+  const [msg, setMsg] = React.useState<string | null>(null);
+
+  if (!faq.items) {
+    setFaq({ ...faq, items: [] });
+  }
+
+  React.useEffect(() => {
+    if (faq && faq.items && faq.items.length > 0) {
+      setFaq(faq);
+    }
+  }, [faq, setFaq]);
+
+  if (!isAuthenticated) {
+    return <p>Sie müssen angemeldet sein, um die FAQ zu bearbeiten.</p>;
+  }
+
+  // Item bearbeiten
+  const handleChange = (idx: number, field: keyof FAQItem, value: string) => {
     const updated = faq.items.map((item, i) =>
       i === idx ? { ...item, [field]: value } : item
     );
     setFaq({ ...faq, items: updated });
-  };
+  }
 
   const handleAdd = () => {
     setFaq({ ...faq, items: [...faq.items, { question: "", answer: "" }] });
@@ -15,6 +60,49 @@ export default function FAQEditor({ faq, setFaq }) {
   const handleDelete = (idx) => {
     setFaq({ ...faq, items: faq.items.filter((_, i) => i !== idx) });
   };
+
+  const handleSaveFAQ = async () => {
+    
+
+    if(!isAuthenticated) {
+      setMsg("Sie müssen angemeldet sein, um Änderungen zu speichern.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setMsg("Kein Auth-Token gefunden! Bitte einloggen.");
+        return;
+      }
+
+      if (!faq.id) {
+        setMsg("Keine FAQ-ID vorhanden. Bitte neu laden.");
+        return;
+      }
+
+      // FAQ speichern
+      const updatedFAQ = await updateExistingFAQ(token, { id: faq.id, title: faq.title, items: faq.items, updatedAt: new Date(), isPage: faq.isPage } as Partial<FAQ>);
+      if (updatedFAQ) {
+        setFaq(updatedFAQ);
+      }
+      setMsg("✅ FAQ gespeichert!");
+    } catch (error) {
+      console.error("Fehler beim Speichern der FAQ:", error);
+      setMsg("❌ Fehler beim Speichern der FAQ.");
+    }
+  }
+
+  if (loading) {
+    return <p>FAQ wird geladen...</p>;
+  }
+  if (error) {
+    return <p>Fehler beim Laden der FAQ: {error}</p>;
+  }
+
+  if (!faq || (faq.items && faq.items.length === 0)) {
+    return <p>Keine FAQ-Daten verfügbar.</p>;
+  }
 
   return (
     <div>
@@ -25,7 +113,7 @@ export default function FAQEditor({ faq, setFaq }) {
         placeholder="FAQ Titel"
         className="mb-2 w-full border rounded p-2"
       />
-      {faq.items.map((item, idx) => (
+      {faq.items && faq.items.map((item, idx) => (
         <div key={idx} className="mb-4 border p-2 rounded">
           <input
             type="text"
@@ -56,6 +144,13 @@ export default function FAQEditor({ faq, setFaq }) {
         className="px-4 py-2 bg-green-600 text-white rounded"
       >
         Neue Frage hinzufügen
+      </button>
+      <button
+        type="button"
+        onClick={handleSaveFAQ}
+        className="ml-4 px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        FAQ speichern
       </button>
     </div>
   );

@@ -20,14 +20,20 @@ export default function Blog() {
       <h1 className="text-3xl font-bold text-green-700 mb-4 text-center">{title}</h1>
       <p className="text-gray-700 mb-8 text-center">{description}</p>
       <ul className="space-y-6">
-        {items && items
-         .filter(item => item.date || item.id).map((item, idx) => (
-          <li key={idx} className="bg-white rounded shadow p-6">
-            <h2 className="font-semibold text-lg mb-2 text-green-800">{item.title}</h2>
-            <div className="text-gray-500 text-sm mb-2">{new Date(item.date).toLocaleDateString()}</div>
-            <p className="text-gray-700">{item.excerpt}</p>
+        { items && items.length > 0 ? (
+          items.filter(item => item.date || item.id).map((item, idx) => (
+            <li key={idx} className="bg-white rounded shadow p-6">
+              <h2 className="font-semibold text-lg mb-2 text-green-800">{item.title}</h2>
+              <div className="text-gray-500 text-sm mb-2">{new Date(item.date).toLocaleDateString()}</div>
+              <p className="text-gray-700">{item.excerpt}</p>
+            </li>
+          ))
+        ) : (
+          <li className="bg-white rounded shadow p-6">
+            <p className="text-gray-500">Keine Blog-Artikel gefunden.</p>
           </li>
-        ))}
+        )}
       </ul>
     </section>
-  )};
+  );
+}

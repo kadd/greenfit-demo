@@ -307,25 +307,18 @@ export default function ContentPage() {
         )}
         {activeTab === "blog" && (
           <BlogTab
-            msg={msg}
             router={router}
           />
         )}
         {activeTab === "faq" && (
           <FaqTab
-            faq={content.faq}
-            setFaq={newFaq => setContent(prev => ({ ...prev, faq: newFaq }))}
-            handleSave={handleSaveFaq}
-            msg={msg}
             router={router}
           />
         )}
         {activeTab === "upload" && <UploadTab onUpload={onUpload} />}
         
         {activeTab === "terms" && (
-          <TermsTab content={content} 
-          setContent={setContent} 
-          handleSave={handleSaveTerms} msg={msg} />
+          <TermsTab router={router} />
         )}
         {activeTab === "impressum" && (
           <ImpressumTab 

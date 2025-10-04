@@ -2,8 +2,9 @@ import { useState, useEffect, use } from "react";
 
 import { Blog, BlogItem } from "@/types/blog";
 
-import { fetchBlog, fetchSinglePost, createPost, updatePost, deletePost,
-    updateBlog, deletePostById, updatePostById, createBlog
+import { fetchBlog, createBlog, deleteBlog, 
+  updateBlog, createPost, fetchSinglePostById, 
+  deletePostById, updatePostById, uploadPostImage, deletePostImage
  } from "@/services/blog";
 
 
@@ -56,6 +57,34 @@ export function useBlog() {
     }
   }
 
+   const updateExistingBlog = async (token: string, blog: Partial<Blog>) => {
+    setLoading(true);
+    setError(null);
+    try {
+        const data = await updateBlog(token, blog);
+        setBlog(data); // <--- Einfach das neue Blog-Objekt setzen!
+        setLoading(false);
+        return data;
+    } catch (err: any) {
+        setError(err.message || "Unbekannter Fehler");
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const deleteExistingBlog = async (token: string, blogId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await deleteBlog(token, blogId);
+      setBlog(null); // Blog wurde gelöscht
+    } catch (err: any) {
+      setError(err.message || "Unbekannter Fehler");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createNewPost = async (token: string, post: BlogItem) => {
     setLoading(true);
     setError(null);
@@ -74,7 +103,8 @@ export function useBlog() {
     setError(null);
     try {
       const data = await updatePostById(token, id, post);
-      setBlog(data);
+      setBlog(prev => prev ? { ...prev, items: prev.items.map(p => p.id === id ? data : p) } : null);
+      return data;
     } catch (err: any) {
       setError(err.message || "Unbekannter Fehler");
     } finally {
@@ -95,27 +125,7 @@ export function useBlog() {
     }
   };
 
-  const updateExistingBlog = async (token: string, id: string, blog: Partial<Blog>) => {
-    setLoading(true);
-    setError(null);
-    try {
-        const data = await updateBlog(token, id, blog);
-        setBlog(data); // <--- Einfach das neue Blog-Objekt setzen!
-        return data;
-    } catch (err: any) {
-        setError(err.message || "Unbekannter Fehler");
-    } finally {
-        setLoading(false);
-    }
-    };
-
-    const addNewEmptyItemWithId = (setBlog: React.Dispatch<React.SetStateAction<Blog | null>>) => {
-        setBlog({ ...blog, items: [...blog.items, { id: Date.now().toString(), title: '', content: '' }] });
-    };
-
-     const addNewEmptyItemWithoutId = (setBlog: React.Dispatch<React.SetStateAction<Blog | null>>) => {
-        setBlog({ ...blog, items: [...blog.items, { title: '', content: '' }] });
-    }
+ 
 
     const deleteExistingPostById = async (token: string, postId: string) => {
         if (!blog) return;
@@ -143,12 +153,11 @@ export function useBlog() {
     loading, 
     error, 
     createNewBlog, 
+    deleteExistingBlog,
     createNewPost, 
     updateExistingPost, 
     deleteExistingPost, 
     updateExistingBlog, 
-    addNewEmptyItemWithId, 
-    addNewEmptyItemWithoutId, 
     deleteExistingPostById, 
     updateExistingPostById };
   };
