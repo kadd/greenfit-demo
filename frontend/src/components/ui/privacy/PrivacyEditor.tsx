@@ -1,35 +1,93 @@
 import React from "react";
 
-type Section = {
-  heading: string;
-  text: string;
-};
+import { PrivacySection, Privacy } from "@/types/privacy";
+
+import { useAuth } from "@/hooks/useAuth";
+import { usePrivacy } from "@/hooks/usePrivacy";
 
 type Props = {
-  sections: Section[];
-  setSections: (sections: Section[]) => void;
+  privacy: Privacy | null;
+  setPrivacy: (privacy: Privacy | null) => void;
+  loading: boolean;
+  error: string | null;
+  updateExistingPrivacy: (token: string, privacyData: Partial<Privacy>) => Promise<void>;
+  createNewPrivacySection: (token: string, sectionData: PrivacySection) => Promise<void>;
+  updateExistingPrivacySectionById: (token: string, sectionId: string, sectionData: Partial<PrivacySection>) => Promise<void>;
+  deleteExistingPrivacySectionById: (token: string, sectionId: string) => Promise<void>;
 };
 
-export default function PrivacyEditor({ sections, setSections }: Props) {
-  const handleChange = (idx: number, field: keyof Section, value: string) => {
+export default function PrivacyEditor({ 
+  privacy, 
+  setPrivacy,
+  loading,
+  error,
+  updateExistingPrivacy,
+  createNewPrivacySection,
+  updateExistingPrivacySectionById,
+  deleteExistingPrivacySectionById,
+ }: Props) {
+
+  const { isAuthenticated } = useAuth();
+  const [msg, setMsg] = React.useState<string | null>(null);
+
+  if (!isAuthenticated) {
+    return <p>Sie müssen angemeldet sein, um den Datenschutz zu bearbeiten.</p>;
+  }
+
+  if (!privacy) {
+    return <p>Keine Datenschutz-Daten verfügbar.</p>;
+  }
+
+  const sections = privacy.sections || [];
+
+  // Abschnitt bearbeiten
+  const handleChange = (idx: number, field: keyof PrivacySection, value: string) => {
     const updated = sections.map((section, i) =>
       i === idx ? { ...section, [field]: value } : section
     );
-    setSections(updated);
+    setPrivacy({ ...privacy, sections: updated });
   };
 
   const handleAdd = () => {
-    setSections([...sections, { heading: "", text: "" }]);
+    setPrivacy({ ...privacy, sections: [...sections, { heading: "", text: "" }] });
   };
 
   const handleDelete = (idx: number) => {
-    setSections(sections.filter((_, i) => i !== idx));
+    setPrivacy({ ...privacy, sections: sections.filter((_, i) => i !== idx) });
   };
+
+  const handleSavePrivacy = async () => {
+    if(!isAuthenticated) {
+      alert("Sie müssen angemeldet sein, um die Änderungen zu speichern.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Kein Authentifizierungs-Token gefunden. Bitte melden Sie sich erneut an.");
+        return;
+      }
+      await updateExistingPrivacy(token, privacy);
+      setMsg("Datenschutz erfolgreich aktualisiert.");
+    } catch (err: any) {
+      alert("Fehler beim Speichern des Datenschutzes: " + (err.message || "Unbekannter Fehler"));
+    }
+  };
+
+  if (loading) {
+    return <p>Datenschutz wird geladen...</p>;
+  }
+
+  if (error) {
+    return <p>Fehler beim Laden des Datenschutzes: {error}</p>;
+  }
+
 
   return (
     <div>
       <h3 className="text-lg font-semibold mb-2">Datenschutz-Abschnitte</h3>
-      {sections.map((section, idx) => (
+      {privacy.sections.map((section, idx) => (
         <div key={idx} className="mb-4 border p-3 rounded">
           <input
             type="text"
@@ -60,6 +118,13 @@ export default function PrivacyEditor({ sections, setSections }: Props) {
         className="px-4 py-2 bg-green-600 text-white rounded"
       >
         Neuen Abschnitt hinzufügen
+      </button>
+        <button
+        type="button"
+        onClick={handleSavePrivacy}
+        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        Änderungen speichern
       </button>
     </div>
   );

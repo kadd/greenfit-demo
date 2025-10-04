@@ -75,10 +75,10 @@ export function useTerms() {
     setError(null);
     try {
       const data = await createTermsSection(token, sectionData);
-      setTerms(terms.map(t => t.sections ? { 
-        ...t, 
-        sections: [...t.sections, data] 
-      } : t)); // Füge die neue Sektion zur Liste hinzu
+      setTerms(terms && terms.sections
+        ? { ...terms, sections: [...terms.sections, data] }
+        : terms
+      ); // Füge die neue Sektion zur Liste hinzu
       return data;
     } catch (err: any) {
       setError(err.message || "Unbekannter Fehler");

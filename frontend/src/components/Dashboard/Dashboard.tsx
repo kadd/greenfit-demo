@@ -322,16 +322,14 @@ export default function ContentPage() {
         )}
         {activeTab === "impressum" && (
           <ImpressumTab 
-          content={content} 
-          setContent={setContent} 
-          handleSave={handleSaveImpressum} msg={msg} />
+            content={content} 
+            setContent={setContent} 
+            handleSave={handleSaveImpressum} msg={msg} />
         )}
         {activeTab === "privacy" && (
           <PrivacyTab 
-          content={content} 
-          setContent={setContent} 
-          handleSave={handleSavePrivacy} msg={msg} />
-        )}
+            router={router} />
+          )}
       </div>
       </div>
        {msg && <p className="mt-4">{msg}</p>}

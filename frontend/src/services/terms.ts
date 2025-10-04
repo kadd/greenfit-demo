@@ -1,3 +1,5 @@
+import { TermsSection } from "@/types/terms";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? process.env.NEXT_PUBLIC_API_URL + '/terms'
   : "http://localhost:5001/api/terms";
@@ -13,7 +15,7 @@ export async function fetchTerms() {
 }   
 
 //create empty terms
-export async function createTerms(token) {
+export async function createTerms(token: string) {
   try {
     const res = await fetch(`${API_URL}/create`, {
       method: 'POST',
@@ -30,7 +32,7 @@ export async function createTerms(token) {
 }   
 
 //update entire terms
-export async function updateTerms(token, terms) {
+export async function updateTerms(token: string, terms: Partial<Terms>) {
   try {
     const res = await fetch(API_URL, {
       method: 'PUT',
@@ -48,7 +50,7 @@ export async function updateTerms(token, terms) {
 }   
 
 //delete entire terms
-export async function deleteTerms(token) {
+export async function deleteTerms(token: string) {
   try {
     const res = await fetch(API_URL, {
       method: 'DELETE',
@@ -64,7 +66,7 @@ export async function deleteTerms(token) {
 } 
 
 // create new terms section
-export function createTermsSection(terms, heading = "Neue Überschrift", text = "Neuer Text") {
+export function createTermsSection(terms: Partial<Terms>, heading = "Neue Überschrift", text = "Neuer Text") {
   const newSection = {
     id: `section-${terms.sections.length + 1}`,
     heading,
@@ -74,7 +76,7 @@ export function createTermsSection(terms, heading = "Neue Überschrift", text = 
 }
 
 // fetch single terms section by ID
-export async function fetchTermsSectionById(sectionId) {
+export async function fetchTermsSectionById(sectionId: string) {
   try {
     const res = await fetch(`${API_URL}/${sectionId}`);
     if (!res.ok) throw new Error("Fehler beim Laden des AGB-Abschnitts");
@@ -85,7 +87,7 @@ export async function fetchTermsSectionById(sectionId) {
 }
 
 // delete single terms section by ID
-export async function deleteTermsSectionById(token, sectionId) {
+export async function deleteTermsSectionById(token: string, sectionId: string) {
   try {
     const res = await fetch(`${API_URL}/${sectionId}`, {
       method: 'DELETE',
@@ -101,7 +103,7 @@ export async function deleteTermsSectionById(token, sectionId) {
 }  
 
 // update single terms section by ID
-export async function updateTermsSectionById(token, sectionId, updatedSection) {
+export async function updateTermsSectionById(token: string, sectionId: string, updatedSection: Partial<TermsSection>) {
   try {
     const res = await fetch(`${API_URL}/${sectionId}`, {
       method: 'PUT',

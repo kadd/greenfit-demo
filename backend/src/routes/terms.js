@@ -125,11 +125,15 @@ router.get('/:id', (req, res) => {
     } catch (parseErr) {
       return res.status(500).json({ error: 'Terms-Daten sind ungültig.' });
     }
-    const section = terms.sections.find(sec => sec.id === sectionId);
-    if (!section) {
-      return res.status(404).json({ error: 'Abschnitt nicht gefunden.' });
+    try {
+      const section = terms.sections.find(sec => sec.id === sectionId);
+      if (!section) {
+        return res.status(404).json({ error: 'Abschnitt nicht gefunden.' });
+      }
+      res.json(section);
+    } catch (parseErr) {
+      res.status(500).json({ error: 'Fehler beim Laden des Abschnitts.' });
     }
-    res.json(section);
   });
 });
 
