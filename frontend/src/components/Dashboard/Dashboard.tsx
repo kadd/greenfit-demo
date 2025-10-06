@@ -21,7 +21,7 @@ import TermsTab from "./TermsTab";
 import ImpressumTab from "./ImpressumTab";
 import PrivacyTab from "./PrivacyTab";
 import UploadTab from "./UploadTab";
-import TeamTab from "./TeamTab";
+import TeamsTab from "./TeamsTab";
 import ServicesTab from "./ServicesTab";
 import FileUpload from "../ui/common/FileUpload";
 
@@ -106,71 +106,7 @@ export default function ContentPage() {
    
   };
 
-  const handleSaveFaq = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    try {
-      if (!token) {
-        router.push("/admin/login");
-        return;
-      }
-      const result = await updateFaq({ faq: content.faq });
-      if (result) {
-        setMsg("✅ FAQ gespeichert!");
-       
-      } else {
-        setMsg("❌ Fehler beim Speichern");
-      }
-    } catch (error) {
-      setMsg("⚠️ Server nicht erreichbar");
-    }
-  }
-
-  const handleSaveTerms = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    try {
-      if (!token) {
-        router.push("/admin/login");
-        return;
-      }
-      const result = await updateTerms(content.termsLong);
-      if (result) {
-        setMsg("✅ AGB gespeichert!");
-       
-      } else {
-        setMsg("❌ Fehler beim Speichern");
-      }
-    } catch (error) {
-      setMsg("⚠️ Server nicht erreichbar");
-    }
-  }
-
-  const handleSavePrivacy = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    try {
-      if (!token) {
-        router.push("/admin/login");
-        return;
-      }
-      const result = await updatePrivacy(content.privacyLong);
-      if (result) {
-        setMsg("✅ Datenschutz gespeichert!");
-       
-      } else {
-        setMsg("❌ Fehler beim Speichern");
-      }
-    } catch (error) {
-      setMsg("⚠️ Server nicht erreichbar");
-    }
-  }
-
   
-
   const handleSaveImpressum = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -213,14 +149,7 @@ export default function ContentPage() {
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6 w-full">
       <AdminHeader />
      
-      <div className="w-full max-w-4xl flex justify-end mb-4">
-        <a
-          href="/"
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold"
-        >
-          Zur Webseite
-        </a>
-      </div>
+ 
        <div className="w-full max-w-4xl">
        
   
@@ -300,7 +229,7 @@ export default function ContentPage() {
           <ServicesTab  handleSave={handleSave} msg={msg} router={router} />
         )}
         {activeTab === "team" && (
-          <TeamTab  handleSave={handleSave} msg={msg} router={router} />
+          <TeamsTab router={router} />
         )}
         {activeTab === "contacts" && (
           <ContactTab contacts={contacts} onDelete={onDelete} />

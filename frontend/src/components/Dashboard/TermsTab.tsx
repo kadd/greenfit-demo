@@ -1,4 +1,4 @@
-import React from "react";
+ import React from "react";
 import TermsEditor from "@/components/ui/terms/TermsEditor";
 
 import { Terms } from "@/types/terms";
