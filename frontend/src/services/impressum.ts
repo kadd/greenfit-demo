@@ -64,7 +64,7 @@ export async function updateImpressumService(impressum: Impressum): Promise<Impr
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     },
-    body: JSON.stringify({ impressumLong })
+    body: JSON.stringify(impressum)
   });
 
   if (!response.ok) {

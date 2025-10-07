@@ -25,6 +25,12 @@ router.post('/create', (req, res) => {
   const blogPath = path.join(__dirname, '../data/blog.json');
   console.log(`Creating empty blog in:`, blogPath);
   const emptyBlog = { title: "Blog", items: [] };
+
+  // Füge eine ID und ein Erstellungsdatum hinzu
+  emptyBlog.id = "blog-" + Date.now();
+  emptyBlog.createdAt = new Date().toISOString();
+  emptyBlog.updatedAt = emptyBlog.createdAt;
+
   fs.writeFile(blogPath, JSON.stringify(emptyBlog, null, 2), (writeErr) => {
     if (writeErr) {
       return res.status(500).json({ error: 'Blog konnte nicht erstellt werden.' });
@@ -74,7 +80,10 @@ router.put('/', (req, res) => {
   // Zeit messen
   const startTime = Date.now();
   console.log(`Start writing blog at ${new Date(startTime).toISOString()}`);
-  
+
+  // Aktualisiere das Blog-Datum
+  updatedBlog.updatedAt = new Date().toISOString();
+
   fs.writeFile(blogPath, JSON.stringify(updatedBlog, null, 2), (writeErr) => {
     if (writeErr) {
       return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });
@@ -94,6 +103,14 @@ router.post('/items/add', (req, res) => {
   }
   const blogPath = path.join(__dirname, '../data/blog.json');
   console.log("Adding new Blog Post to:", blogPath);
+
+  // Füge eine ID hinzu
+  newPost.id = "post-" + Date.now();
+
+  // Füge ein Erstellungsdatum hinzu
+  newPost.createdAt = new Date().toISOString();
+  newPost.updatedAt = newPost.createdAt;
+
   fs.readFile(blogPath, 'utf8', (err, data) => {
     if (err) {
       return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
@@ -143,6 +160,7 @@ router.delete('/items/:id', (req, res) => {
   const postId = req.params.id;
   const blogPath = path.join(__dirname, '../data/blog.json');
   console.log(`Deleting Blog Post ID ${postId} in:`, blogPath);
+
   fs.readFile(blogPath, 'utf8', (err, data) => {
     if (err) {
       return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
@@ -154,6 +172,10 @@ router.delete('/items/:id', (req, res) => {
         return res.status(404).json({ error: 'Blog-Post nicht gefunden.' });
       }
       blog.items.splice(postIndex, 1);
+
+      // Aktualisiere das Blog-Datum
+      blog.updatedAt = new Date().toISOString();
+
       fs.writeFile(blogPath, JSON.stringify(blog, null, 2), (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });
@@ -190,6 +212,7 @@ router.put('/items/:id', (req, res) => {
         return res.status(404).json({ error: 'Blog-Post nicht gefunden.' });
       }
       blog.items[postIndex] = { ...blog.items[postIndex], ...updatedPost };
+      blog.updatedAt = new Date().toISOString();
       fs.writeFile(blogPath, JSON.stringify(blog, null, 2), (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });

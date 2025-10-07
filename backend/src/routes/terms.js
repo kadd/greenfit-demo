@@ -24,7 +24,13 @@ router.get('/', (req, res) => {
 router.post('/create', (req, res) => {
   const termsPath = path.join(__dirname, '../data/terms.json');
   console.log(`Creating empty terms in:`, termsPath);
-  const emptyTerms = { title: "AGB", isPage: true, description: "Beschreibung der AGB", updatedAt: new Date().toISOString(), sections: [] };
+  const emptyTerms = { 
+    title: "AGB", 
+    isPage: true, 
+    description: "Beschreibung der AGB", 
+    updatedAt: new Date().toISOString(), 
+    sections: [] 
+  };
   fs.writeFile(termsPath, JSON.stringify(emptyTerms, null, 2), (writeErr) => {
     if (writeErr) {
       return res.status(500).json({ error: 'Terms konnten nicht erstellt werden.' });
@@ -51,6 +57,9 @@ router.put('/', (req, res) => {
     ...section,
     id: section.id || `section-${index + 1}`
   }));
+
+  // Aktualisiere das updatedAt-Feld
+  terms.updatedAt = new Date().toISOString();
 
   // Optional: Validierung
   if (!terms || typeof terms.title !== 'string' || !Array.isArray(terms.sections)) {
@@ -101,6 +110,11 @@ router.post('/add', (req, res) => {
     // Neuen Abschnitt mit ID hinzufügen
     const sectionWithId = { id: `section-${Date.now()}`, ...newSection };
     terms.sections.push(sectionWithId);
+
+    // Aktualisiere das updatedAt-Feld
+    terms.updatedAt = new Date().toISOString();
+
+    // Speichere die aktualisierten Terms
 
     fs.writeFile(termsPath, JSON.stringify(terms, null, 2), (writeErr) => {
       if (writeErr) {
@@ -161,6 +175,7 @@ router.put('/:id', (req, res) => {
       return res.status(404).json({ error: 'Abschnitt nicht gefunden.' });
     }
     terms.sections[sectionIndex] = { id: sectionId, ...updatedSection };
+    terms.updatedAt = new Date().toISOString();
     fs.writeFile(termsPath, JSON.stringify(terms, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'Abschnitt konnte nicht aktualisiert werden.' });
@@ -189,6 +204,7 @@ router.delete('/:id', (req, res) => {
       return res.status(404).json({ error: 'Abschnitt nicht gefunden.' });
     }
     terms.sections.splice(sectionIndex, 1);
+    terms.updatedAt = new Date().toISOString();
     fs.writeFile(termsPath, JSON.stringify(terms, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'Abschnitt konnte nicht gelöscht werden.' });

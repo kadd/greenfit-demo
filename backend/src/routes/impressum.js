@@ -39,6 +39,18 @@ router.post('/', (req, res) => {
   if (!newImpressum || typeof newImpressum !== 'object') {
     return res.status(400).json({ error: 'Ungültige Impressum-Daten.' });
   }
+
+  // Füge eine ID und ein Erstellungsdatum hinzu
+  newImpressum.id = newImpressum.id || 'impressum';
+  newImpressum.createdAt = new Date().toISOString();
+  newImpressum.updatedAt = newImpressum.updatedAt || newImpressum.createdAt;
+
+  // Überprüfe, ob die Datei bereits existiert
+  if (fs.existsSync(impressumPath)) {
+    return res.status(400).json({ error: 'Impressum existiert bereits. Bitte aktualisieren Sie es stattdessen.' });
+  }
+
+  // Speichere das neue Impressum
   fs.writeFile(impressumPath, JSON.stringify(newImpressum, null, 2), 'utf8', (err) => {
     if (err) {
       return res.status(500).json({ error: 'Impressum konnten nicht erstellt werden.' });
@@ -54,6 +66,10 @@ router.put('/', (req, res) => {
   if (!updatedImpressum || typeof updatedImpressum !== 'object') {
     return res.status(400).json({ error: 'Ungültige Impressum-Daten.' });
   }
+
+  // Füge ein Aktualisierungsdatum hinzu
+  updatedImpressum.updatedAt = new Date().toISOString();  
+  updatedImpressum.id = updatedImpressum.id || 'impressum';
   fs.writeFile(impressumPath, JSON.stringify(updatedImpressum, null, 2), 'utf8', (err) => {
     if (err) {
       return res.status(500).json({ error: 'Impressum konnten nicht gespeichert werden.' });
@@ -251,6 +267,10 @@ router.post('/section', (req, res) => {
         return res.status(400).json({ error: 'Abschnitt mit dieser ID existiert bereits.' });
       }
       impressum.sections.push(newSection);
+
+      // Aktualisiere das Impressum-Datum
+      impressum.updatedAt = new Date().toISOString();
+
       fs.writeFile(impressumPath, JSON.stringify(impressum, null, 2), 'utf8', (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Abschnitt konnten nicht hinzugefügt werden.' });
@@ -284,6 +304,10 @@ router.put('/section/:id', (req, res) => {
       }
       updatedSection.id = sectionId; // ID beibehalten
       impressum.sections[idx] = updatedSection;
+
+      // Aktualisiere das Impressum-Datum
+      impressum.updatedAt = new Date().toISOString();
+
       fs.writeFile(impressumPath, JSON.stringify(impressum, null, 2), 'utf8', (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Abschnitt konnten nicht aktualisiert werden.' });
@@ -312,6 +336,10 @@ router.delete('/section/:id', (req, res) => {
         return res.status(404).json({ error: 'Abschnitt nicht gefunden.' });
       } 
       impressum.sections.splice(idx, 1);
+
+      // Aktualisiere das Impressum-Datum
+      impressum.updatedAt = new Date().toISOString();
+      
       fs.writeFile(impressumPath, JSON.stringify(impressum, null, 2), 'utf8', (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Abschnitt konnten nicht gelöscht werden.' });

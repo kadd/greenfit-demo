@@ -101,13 +101,15 @@ export default function ImpressumEditor({ impressum, setImpressum }) {
         <div key={section.id} className="mb-6 p-4 rounded border border-gray-200 bg-gray-50">
           <div className="mb-2">
             <label className="block font-semibold mb-1" htmlFor={`section-key-${section.id}`}>Schlüssel</label>
+            {/* readonly ohne focus */}
             <input
               id={`section-key-${section.id}`}
               type="text"
               value={section.key}
               onChange={e => handleSectionChange(idx, "key", e.target.value)}
               placeholder="z.B. impressum, kontakt"
-              className="border rounded px-2 py-1 w-full mb-2"
+              className="border rounded px-2 py-1 w-full mb-2 bg-gray-100 focus:outline-none"
+              readOnly
             />
           </div>
           <div className="mb-2">

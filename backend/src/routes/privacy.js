@@ -24,6 +24,12 @@ router.post('/create', (req, res) => {
   const privacyPath = path.join(__dirname, '../data/privacy.json');
   console.log(`Creating empty privacy in:`, privacyPath);
   const emptyPrivacy = { title: "Datenschutz", isPage: true, description: "Beschreibung der Datenschutzrichtlinie", updatedAt: new Date().toISOString(), sections: [] };
+  
+  // Füge eine ID und ein Erstellungsdatum hinzu
+  emptyPrivacy.id = "privacy-" + Date.now();
+  emptyPrivacy.createdAt = new Date().toISOString();
+  emptyPrivacy.updatedAt = emptyPrivacy.createdAt;
+
   fs.writeFile(privacyPath, JSON.stringify(emptyPrivacy, null, 2), (writeErr) => {
     if (writeErr) {
       return res.status(500).json({ error: 'Privacy konnten nicht erstellt werden.' });
@@ -57,6 +63,10 @@ router.put('/', (req, res) => {
     return res.status(400).json({ error: 'Ungültige Privacy-Daten.' });
   }
 
+  // Aktualisiere das updatedAt-Feld
+  privacy.updatedAt = new Date().toISOString();
+
+  // Speichere die Privacy
   fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
     isWriting = false;
     if (writeErr) {
@@ -102,6 +112,11 @@ router.post('/section', (req, res) => {
     
     const sectionWithId = { ...newSection, id: `section-${privacy.sections.length + 1}` };
     privacy.sections.push(sectionWithId);
+
+    // Aktualisiere das updatedAt-Feld
+    privacy.updatedAt = new Date().toISOString();
+
+    // Speichere die aktualisierten Privacy-Daten
 
     fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
       if (writeErr) {
@@ -163,6 +178,11 @@ router.put('/:id', (req, res) => {
       return res.status(404).json({ error: 'Sektion nicht gefunden.' });
     }
     privacy.sections[sectionIndex] = { id: sectionId, ...updatedSection };
+
+    // Aktualisiere das updatedAt-Feld
+    privacy.updatedAt = new Date().toISOString();
+
+    // Speichere die aktualisierten Privacy-Daten
     fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'Sektion konnte nicht aktualisiert werden.' });
@@ -192,6 +212,11 @@ router.delete('/:id', (req, res) => {
       return res.status(404).json({ error: 'Sektion nicht gefunden.' });
     }
     privacy.sections.splice(sectionIndex, 1);
+
+    // Aktualisiere das updatedAt-Feld
+    privacy.updatedAt = new Date().toISOString();
+
+    // Speichere die aktualisierten Privacy-Daten
     fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'Sektion konnte nicht gelöscht werden.' });

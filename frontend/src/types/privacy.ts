@@ -7,6 +7,7 @@ export interface PrivacySection {
 
 export interface Privacy { 
     id?: string;
+    createdAt?: string;
     updatedAt?: string;
     isPage: boolean;
     title: string;

@@ -33,6 +33,21 @@ router.post('/create', (req, res) => {
     return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
   }
 
+  // id zu items hinzufügen
+  if (Array.isArray(faqs)) {
+    faqs.forEach(item => {
+      item.id = item.id || Date.now().toString(); // einfache ID, wenn nicht vorhanden
+      item.createdAt = new Date().toISOString();
+      item.updatedAt = item.updatedAt || item.createdAt;
+    });
+  }
+
+  // Neues Impressum erstellen
+  faqs.createdAt = new Date().toISOString();
+  faqs.updatedAt = faqs.updatedAt || faqs.createdAt;
+
+  // Speichere die FAQ
+
   fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
     if (writeErr) {
       return res.status(500).json({ error: 'FAQ konnte nicht gespeichert werden.' });
@@ -57,7 +72,9 @@ router.put('/', (req, res) => {
     faq.items = faq.items.map(item => ({
       id: item.id || Date.now().toString(), // einfache ID, wenn nicht vorhanden
       question: item.question,
-      answer: item.answer
+      answer: item.answer,
+      createdAt: item.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }));
   }
 
@@ -66,6 +83,11 @@ router.put('/', (req, res) => {
     console.log("Invalid FAQ data:", faq);
     return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
   }
+
+  // Aktualisiere das FAQ-Datum
+  faq.updatedAt = new Date().toISOString();
+
+  // Speichere die FAQ
 
   fs.writeFile(faqPath, JSON.stringify(faq, null, 2), (writeErr) => {
     isWriting = false;
@@ -107,7 +129,13 @@ router.post('/add', (req, res) => {
       return res.status(500).json({ error: 'FAQ-Daten sind ungültig.' });
     }
     newFaqItem.id = Date.now().toString(); // einfache ID
+    newFaqItem.createdAt = new Date().toISOString();
+    newFaqItem.updatedAt = new Date().toISOString();
     faqs.push(newFaqItem);
+
+    // Aktualisiere das FAQ-Datum
+    faqs.updatedAt = new Date().toISOString();
+
     fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'FAQ konnte nicht gespeichert werden.' });
@@ -164,6 +192,11 @@ router.put('/items/:id', (req, res) => {
     }
     updatedFaq.id = faqItemId; // ID beibehalten
     faqs[faqIndex] = updatedFaq;
+    updatedFaq.updatedAt = new Date().toISOString();
+
+    // Aktualisiere das FAQ-Datum
+    faqs.updatedAt = new Date().toISOString();
+
     fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'FAQ konnte nicht aktualisiert werden.' });
@@ -193,6 +226,10 @@ router.delete('/:id', (req, res) => {
       return res.status(404).json({ error: 'FAQ-Item nicht gefunden.' });
     }
     faqs.splice(faqIndex, 1);   
+
+    // Aktualisiere das FAQ-Datum
+    faqs.updatedAt = new Date().toISOString();
+    
     fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
       if (writeErr) {
         return res.status(500).json({ error: 'FAQ konnte nicht gelöscht werden.' });
