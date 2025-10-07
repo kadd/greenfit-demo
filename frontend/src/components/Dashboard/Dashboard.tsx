@@ -251,9 +251,7 @@ export default function ContentPage() {
         )}
         {activeTab === "impressum" && (
           <ImpressumTab 
-            content={content} 
-            setContent={setContent} 
-            handleSave={handleSaveImpressum} msg={msg} />
+            router={router} />
         )}
         {activeTab === "privacy" && (
           <PrivacyTab 

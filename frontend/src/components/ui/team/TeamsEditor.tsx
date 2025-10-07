@@ -54,7 +54,14 @@ export default function TeamsEditor({
       photoSrc: ""
     });
     if (newMember) {
-      setMembers([...members, newMember]);
+      //setMembers([...members, newMember]);
+      setTeams(prev =>
+        prev.map(t =>
+          t.id === team.id
+            ? { ...t, members: [...(t.members || []), newMember] }
+            : t
+        )
+      );
       setMsg("Neues Mitglied hinzugefügt!");
     }
   };
