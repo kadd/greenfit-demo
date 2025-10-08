@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import UploadEditor from "@/components/ui/uploads/UploadEditor";
+import UploadEditor from "@/components/Dashboard/Editors/uploads/UploadEditor";
 
 export default function UploadTab({ onUpload }) {
 

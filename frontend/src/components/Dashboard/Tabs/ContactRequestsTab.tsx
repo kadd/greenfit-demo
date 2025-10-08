@@ -1,4 +1,4 @@
-export default function ContactTab({ contacts, onDelete }) {
+export default function ContactRequestsTab({ contacts, onDelete }) {
   return (
     <section>
       <h2 className="text-2xl font-bold text-green-700 mb-2">Kontaktanfragen</h2>

@@ -1,6 +1,6 @@
 "use client";
 import { use, useEffect, useState } from "react";
-import { useContact } from "@/hooks/useContact";
+import { useContact } from "@/hooks/useContactRequests";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useContent } from "@/hooks/useContent";
@@ -13,11 +13,11 @@ import HamburgerButton from "@/components/Navigation/HamburgerButton";
 import OverlayMenu from "@/components/Navigation/OverlayMenu";
 import ScrollToTopButton from "@/components/Navigation/ScrollToTopButton";
 
-import ContactForm from "@/components/ui/contact/ContactForm";
-import ContentSection from "@/components/ui/ContentSection";
-import GallerySection from "@/components/ui/GallerySection";
-import TeamSection from "@/components/ui/TeamSection";
-import TestimonialsSection from "@/components/ui/TestimonialsSection";
+import ContactForm from "@/components/Home/contact/ContactForm";
+import ContentSection from "@/components/Home/Sections/ContentSection";
+import GallerySection from "@/components/Home/Sections/GallerySection";
+import TeamSection from "@/components/Home/Sections/TeamSection";
+import TestimonialsSection from "@/components/Home/Sections/TestimonialsSection";
 import FaqPage from "@/components/Pages/FaqPage";
 import Footer from "@/components/Footer/Footer";
 

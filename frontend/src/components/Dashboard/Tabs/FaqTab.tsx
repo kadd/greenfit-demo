@@ -1,5 +1,5 @@
 import React from "react";
-import FAQEditor from "../ui/faq/FAQEditor";
+import FAQEditor from "../Editors/faq/FAQEditor";
 
 import { FAQ } from "@/types/faq";
 import { FAQItem } from "@/types/faq";

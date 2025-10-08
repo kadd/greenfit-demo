@@ -1,19 +1,19 @@
 import React, { useState }  from "react";
 
-import FormSection from "../FormSection";
+import FormSection from "../Sections/FormSection";
 
-import { useContact } from "@/hooks/useContact";
+import { useContact } from "@/hooks/useContactRequests";
 
 export default function ContactForm({info_message}: {info_message?: string}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const { contactSentStatus, sendContact, loading } = useContact();
+  const { contactRequestSentStatus, sendContactRequest, loading } = useContact();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await sendContact({ name, email, message });
+    await sendContactRequest({ name, email, message });
     setName("");
     setEmail("");
     setMessage("");
@@ -57,9 +57,9 @@ export default function ContactForm({info_message}: {info_message?: string}) {
          
         </FormSection>  
 
-        {contactSentStatus && (
+        {contactRequestSentStatus && (
           <p className="text-center text-green-700 mt-4">
-            {contactSentStatus === "Gesendet!"
+            {contactRequestSentStatus === "Gesendet!"
               ? "✅ Ihre Nachricht wurde gesendet!"
               : "❌ Fehler beim Senden. Bitte versuchen Sie es später erneut."}
           </p>

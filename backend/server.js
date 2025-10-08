@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Import Routes
-const contactRoute = require("./src/routes/contact");
+const contactRequestsRoute = require("./src/routes/contactrequests");
 const servicesRoute = require("./src/routes/services");
 const authRoutes = require("./src/routes/auth");
 const adminRoute = require("./src/routes/admin");
@@ -32,7 +32,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Use Routes
 app.use("/api/services", servicesRoute);
-app.use("/api/contact", contactRoute);
+app.use("/api/contactrequests", contactRequestsRoute);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoute);
 app.use("/api/content", contentRoute);

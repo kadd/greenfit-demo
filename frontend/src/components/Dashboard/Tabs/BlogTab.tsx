@@ -1,5 +1,5 @@
 import React from "react";
-import BlogEditor from "../ui/blog/BlogEditor";
+import BlogEditor from "../Editors/blog/BlogEditor";
 
 import { Blog } from "@/types/blog";
 import { useBlog } from "@/hooks/useBlog";

@@ -2,7 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? process.env.NEXT_PUBLIC_API_URL + '/services'
   : "http://localhost:5001/api/services";
 
-export async function getServicesDataService(token?: string) {
+export async function getServiceObjectService(token?: string) {
   // ohne Token, wenn öffentlich zugänglich
   if (!token) {
     const res = await fetch(`${API_URL}`);
@@ -16,9 +16,23 @@ export async function getServicesDataService(token?: string) {
   return res.json();
 }
 
-export async function updateServicesDataService(token: string, data: any) {
-  const res = await fetch(`${API_URL}`, {
+// neues Service-Objekt erstellen
+export async function createServiceObjectService(token: string, data: any) {
+  const res = await fetch(`${API_URL}/create`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create services data");
+  return res.json();
+}
+
+export async function updateServiceObjectService(token: string, data: any) {
+  const res = await fetch(`${API_URL}`, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -29,12 +43,61 @@ export async function updateServicesDataService(token: string, data: any) {
   return res.json();
 }
 
-export async function uploadServiceImageService(token: string, serviceKey: string, file: File) {
+export async function deleteServiceObjectService(token: string) {
+  const res = await fetch(`${API_URL}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to delete services data");
+  return res.json();
+}
+
+// create specific content-item of existing service object
+export async function createServiceContentService(token: string, contentKey: string, serviceDataForContentKey: any) {
+  const res = await fetch(`${API_URL}/create/${contentKey}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(serviceDataForContentKey),
+  });
+  if (!res.ok) throw new Error("Failed to create service section");
+  return res.json();
+}
+
+
+// update specific content-item of existing service object
+export async function updateServiceContentService(token: string, contentKey: string, serviceDataForContentKey: any) {
+  const res = await fetch(`${API_URL}/${contentKey}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(serviceDataForContentKey),
+  });
+  if (!res.ok) throw new Error("Failed to update service section");
+  return res.json();
+}
+
+// delete specific content-item of existing service object
+export async function deleteServiceContentService(token: string, contentKey: string) {
+  const res = await fetch(`${API_URL}/${contentKey}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to delete service section");
+  return res.json();
+} 
+
+
+export async function uploadServiceItemImageService(token: string, contentKey: string, file: File) {
   const formData = new FormData();
   formData.append("image", file);
-  formData.append("serviceKey", serviceKey);
+  formData.append("contentKey", contentKey);
 
-  const res = await fetch(`${API_URL}/upload-image/${serviceKey}`, {
+  const res = await fetch(`${API_URL}/upload-image/${contentKey}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
@@ -42,3 +105,12 @@ export async function uploadServiceImageService(token: string, serviceKey: strin
   if (!res.ok) throw new Error("Image upload failed");
   return res.json();
 }
+
+export async function deleteServiceItemImageService(token: string, contentKey: string) {
+  const res = await fetch(`${API_URL}/delete-image/${contentKey}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Image deletion failed");
+  return res.json();
+} 

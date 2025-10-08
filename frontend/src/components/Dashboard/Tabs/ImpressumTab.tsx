@@ -1,4 +1,4 @@
-import ImpressumEditor from "@/components/ui/impressum/ImpressumEditor";
+import ImpressumEditor from "@/components/Dashboard/Editors/impressum/ImpressumEditor";
 import { useState } from "react";
 import { useImpressum } from "@/hooks/useImpressum";
 

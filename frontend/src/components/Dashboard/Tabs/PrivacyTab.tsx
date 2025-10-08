@@ -1,5 +1,5 @@
 import React from "react";
-import PrivacyEditor from "@/components/ui/privacy/PrivacyEditor";
+import PrivacyEditor from "@/components/Dashboard/Editors/privacy/PrivacyEditor";
 
 import { Privacy, PrivacySection } from "@/types/privacy";
 import { usePrivacy } from "@/hooks/usePrivacy";

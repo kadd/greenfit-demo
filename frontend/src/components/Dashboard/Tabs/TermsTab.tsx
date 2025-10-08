@@ -1,5 +1,5 @@
  import React from "react";
-import TermsEditor from "@/components/ui/terms/TermsEditor";
+import TermsEditor from "@/components/Dashboard/Editors/terms/TermsEditor";
 
 import { Terms } from "@/types/terms";
 import { useTerms } from "@/hooks/useTerms";

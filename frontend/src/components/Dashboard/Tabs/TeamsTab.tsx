@@ -1,4 +1,4 @@
-import TeamsEditor from "../ui/team/TeamsEditor";
+import TeamsEditor from "../Editors/team/TeamsEditor";
 import React from "react";
 import { useTeams } from "@/hooks/useTeams";
 import { useAuth } from "@/hooks/useAuth";

@@ -1,4 +1,4 @@
-import ContentForm from "../ui/content/ContentForm";
+import ContentForm from "../../ui/content/ContentForm";
 
 export default function ContentTab({ content, setContent, handleSave, msg, router }) {
   return (

@@ -3,7 +3,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useContent } from "@/hooks/useContent";
-import { useContact } from "@/hooks/useContact";
+import { useContact } from "@/hooks/useContactRequests";
 
 import { ContentData } from "@/types/contentData";
 import DashboardForm from "@/components/ui/_dashboard/DashboardForm";
@@ -13,16 +13,16 @@ import { getEmptyContentData, mapContentData } from "@/utils/mapCotentData";
 
 import { useContentContext } from "@/contexts/contentContext";
 
-import ContentTab from "./ContentTab";
-import ContactTab from "./ContactTab";
-import FaqTab from "./FaqTab";
-import BlogTab from "./BlogTab";
-import TermsTab from "./TermsTab";
-import ImpressumTab from "./ImpressumTab";
-import PrivacyTab from "./PrivacyTab";
-import UploadTab from "./UploadTab";
-import TeamsTab from "./TeamsTab";
-import ServicesTab from "./ServicesTab";
+import ContentTab from "./Tabs/ContentTab";
+import ContactRequestsTab from "./Tabs/ContactRequestsTab";
+import FaqTab from "./Tabs/FaqTab";
+import BlogTab from "./Tabs/BlogTab";
+import TermsTab from "./Tabs/TermsTab";
+import ImpressumTab from "./Tabs/ImpressumTab";
+import PrivacyTab from "./Tabs/PrivacyTab";
+import UploadTab from "./Tabs/UploadTab";
+import TeamsTab from "./Tabs/TeamsTab";
+import ServicesTab from "./Tabs/ServicesTab";
 import FileUpload from "../ui/common/FileUpload";
 
 
@@ -41,13 +41,13 @@ export default function ContentPage() {
     updateBlog, updateFaq, updateTerms, updatePrivacy, updateImpressum
    } = useContent(token || "");
 
-  const { contacts, deleteContact, fetchContactsGroupedByEmail } = useContact();
+  const { contactRequests, deleteContactRequest, fetchContactRequestsGroupedByEmail } = useContact();
 
   const onDelete = async (date: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await deleteContact(date);
-      await fetchContactsGroupedByEmail(); // <-- Funktion direkt aus dem Hook
+      await deleteContactRequest(date);
+      await fetchContactRequestsGroupedByEmail(); // <-- Funktion direkt aus dem Hook
     } catch (error) {
       console.error("Fehler beim Löschen der Nachricht:", error);
     }
@@ -82,7 +82,24 @@ export default function ContentPage() {
     return <p className="p-6">Lade Inhalte...</p>;
   }
 
-  // Inhalte speichern
+  
+
+  const onUpload = (fileUrl: string) => {
+    // Hier können Sie die Logik zum Aktualisieren des Inhalts mit der neuen Datei-URL implementieren
+    setMsg(`✅ Datei hochgeladen: ${fileUrl}`);
+    
+    // Beispiel: setContent(prev => ({ ...prev, imageUrl: fileUrl }));
+  }
+
+  if (error) {
+    return <p className="p-6">Fehler beim Laden der Inhalte: {error.message}</p>;
+  }
+
+  if (!data) {
+    return <p className="p-6">Keine Inhalte gefunden.</p>;
+  }
+
+ // Inhalte speichern
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -106,44 +123,6 @@ export default function ContentPage() {
    
   };
 
-  
-  const handleSaveImpressum = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    try {
-      if (!token) {
-        router.push("/admin/login");
-        return;
-      }
-      const result = await updateImpressum(content.impressumLong);
-      if (result) {
-        setMsg("✅ Impressum gespeichert!");
-       
-      } else {
-        setMsg("❌ Fehler beim Speichern");
-      }
-    } catch (error) {
-      setMsg("⚠️ Server nicht erreichbar");
-    }
-  }
-
-  const onUpload = (fileUrl: string) => {
-    // Hier können Sie die Logik zum Aktualisieren des Inhalts mit der neuen Datei-URL implementieren
-    setMsg(`✅ Datei hochgeladen: ${fileUrl}`);
-    
-    // Beispiel: setContent(prev => ({ ...prev, imageUrl: fileUrl }));
-  }
-
-  if (error) {
-    return <p className="p-6">Fehler beim Laden der Inhalte: {error.message}</p>;
-  }
-
-  if (!data) {
-    return <p className="p-6">Keine Inhalte gefunden.</p>;
-  }
-
- 
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6 w-full">
@@ -226,13 +205,13 @@ export default function ContentPage() {
         )}
 
         {activeTab === "services" && (
-          <ServicesTab  handleSave={handleSave} msg={msg} router={router} />
+          <ServicesTab router={router} />
         )}
         {activeTab === "team" && (
           <TeamsTab router={router} />
         )}
         {activeTab === "contacts" && (
-          <ContactTab contacts={contacts} onDelete={onDelete} />
+          <ContactRequestsTab contacts={contactRequests} onDelete={onDelete} />
         )}
         {activeTab === "blog" && (
           <BlogTab
