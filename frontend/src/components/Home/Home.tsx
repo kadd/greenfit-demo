@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useContent } from "@/hooks/useContent";
 import { useServices } from "@/hooks/useServices";
+import { useGCSUpload } from "@/hooks/useGCSUpload";
 
 import { ContentData } from "@/types/contentData";
 import { ServiceData } from "@/types/service";
@@ -40,6 +41,8 @@ export default function Home() {
 
   const emptyServices: ServiceData = { label: "", description: "", content: {} };
   const { services = emptyServices } = useServices();
+
+  const { gallery } = useGCSUpload();
   
   // Zustand für Sichtbarkeit des Buttons
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -90,7 +93,7 @@ export default function Home() {
   }
 
   if (error) {
-    return <p className="p-6 text-red-500">Fehler beim Laden der Inhalte: {error}</p>;
+    return <p className="p-6 text-red-500">Fehler beim Laden der Inhalte: {error?.message || String(error)}</p>;
   }
 
   if (!content) {
@@ -187,8 +190,8 @@ export default function Home() {
         </ContentSection>
 
         <GallerySection id="gallery"
-          images={content.gallery?.images || []}
-          title={content.gallery?.title || "Impressionen"}
+          files={gallery || []}
+          title={"Impressionen"}
         />
 
         

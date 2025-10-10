@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { submitContactRequest, getContactRequests, getContactRequestsGroupedByEmail,
     deleteContactRequestById, replyContactRequest, getAllContactRequests, clearContactRequests,
-    addCommentToContactRequest, exportContactRequestsToCSV, filterContactRequestsByEmail,
-    updateContactRequestStatus
+    addCommentToContactRequestById, exportContactRequestsToCSV, filterContactRequestsByEmail,
+    updateContactRequestStatusById
  } = require("../controllers/contactRequestsController");
 
 
@@ -30,7 +30,7 @@ router.delete("/:date", deleteContactRequestById);
 router.post("/:id/reply", replyContactRequest);
 
 // Kommentar zu Kontaktanfrage hinzufügen
-router.post("/comment", addCommentToContactRequest);
+router.put("/:id/comment", addCommentToContactRequestById);
 
 // Kontaktanfragen nach E-Mail filtern
 router.get("/filterbyEmail", filterContactRequestsByEmail);
@@ -38,8 +38,8 @@ router.get("/filterbyEmail", filterContactRequestsByEmail);
 // Kontaktanfragen als CSV exportieren
 router.get("/export/csv", exportContactRequestsToCSV);
 
-// Kontaktstatus aktualisieren
-router.put("/status", updateContactRequestStatus);
+// Kontaktrequeststatus aktualisieren
+router.put("/status", updateContactRequestStatusById);
 
 // Optional: Alle Kontaktanfragen abrufen (für Admin-Dashboard)
  router.get("/all", getAllContactRequests);

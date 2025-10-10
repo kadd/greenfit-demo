@@ -15,6 +15,7 @@ export type ContentData = {
       [key: string]: {
         label: string;
         href: string;
+        isActive: boolean;
       };
     };
   };

@@ -114,9 +114,10 @@ exports.replyContactRequest = (req, res) => {
   res.json({ success: true, msg: "Antwort gesendet!", replyMessage: { email, subject, message } });
 };
 
-// erstelle Kommentar zu Kontaktanfrage
-exports.addCommentToContactRequest = (req, res) => {
-  const { id, comment } = req.body;
+// erstelle Kommentar zu Kontaktanfrage (put)
+exports.addCommentToContactRequestById = (req, res) => {
+  const { id } = req.params;
+  const { comment } = req.body;
   if (!id || !comment) {
     return res.status(400).json({ error: 'ID und Kommentar sind erforderlich.' });
   }
@@ -132,8 +133,6 @@ exports.addCommentToContactRequest = (req, res) => {
   contactrequests[contactIndex].comment = comment;
   fs.writeFileSync(CONTACTREQUESTS_FILE, JSON.stringify(contactrequests, null, 2));
   res.json({ success: true, msg: "Kommentar hinzugefügt!" });
-  console.log(`Kommentar zu Kontaktanfrage am ${date}: ${comment}`);
-  return res.json({ success: true, msg: "Kommentar hinzugefügt!" });
 };
 
 // exportiere alle Kontaktanfragen in csv (für Admin-Dashboard)
@@ -178,17 +177,17 @@ exports.addCommentToContactRequest = (req, res) => {
  };
 
  // markiere Kontaktanfrage mit Status (für Admin-Dashboard)
- exports.updateContactRequestStatus = (req, res) => {
-   const { date, status } = req.body;
-   if (!date || !status) {
-     return res.status(400).json({ error: 'Datum und Status sind erforderlich.' });
+ exports.updateContactRequestStatusById = (req, res) => {
+   const { id, status } = req.body;
+   if (!id || !status) {
+     return res.status(400).json({ error: 'ID und Status sind erforderlich.' });
    }
    let contactrequests = [];
    if (fs.existsSync(CONTACTREQUESTS_FILE)) {
      const fileContent = fs.readFileSync(CONTACTREQUESTS_FILE, "utf8");
      contactrequests = fileContent.trim().length > 0 ? JSON.parse(fileContent) : [];
    }
-   const contactIndex = contactrequests.findIndex(msg => msg.date === date);
+   const contactIndex = contactrequests.findIndex(msg => msg.id === id);
    if (contactIndex === -1) {
      return res.status(404).json({ error: 'Kontaktanfrage nicht gefunden.' });
    }

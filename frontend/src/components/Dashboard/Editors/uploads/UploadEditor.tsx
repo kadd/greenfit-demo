@@ -1,6 +1,8 @@
 import React, { use, useState } from "react";
 
-import { useUpload } from "@/hooks/useUpload";
+
+import { useGCSUpload } from "@/hooks/useGCSUpload";
+
 import  { UploadArea } from "@/types/uploadArea";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,7 +22,8 @@ export default function UploadEditor({ onUpload }) {
   const [msg, setMsg] = useState("");
   const { token } = useAuth();
 
-  const { areas, files, uploadFileToArea, deleteFile, getAreas } = useUpload(token);
+  const { areas, files, uploadFile, deleteFile, getAreas } = useGCSUpload(token);
+  //const { areas, files, uploadFileToGCS, deleteFileFromGCS, getAreas } = useGCSUpload(token);
 
   const handleAreaChange = (e) => {
     setSelectedArea(e.target.value);
@@ -73,7 +76,7 @@ const handleUploadDirect = async (areaKey: string, file: File) => {
 
   const areasArray = Array.isArray(areas) ? areas : [];
 
-  if(!files) return <p>Lade Dateien...</p>;
+  
   if(!areas) return <p>Lade Bereiche...</p>;
   
 

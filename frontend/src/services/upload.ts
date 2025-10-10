@@ -1,6 +1,13 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL+'/upload' || "http://localhost:5001/api/upload";
 
+// Daten für unauthentifizierte Nutzer abrufen
+export async function fetchPublicGallery() {
+  const res = await fetch(`${API_URL}/public_gallery`);
+  if (!res.ok) throw new Error("Failed to fetch public gallery");
+  return res.json();
+}
+
 // Datei-Upload single file ohne Bereich
 export async function uploadFile(token: string, formData: FormData) {
   const res = await fetch(`${API_URL}`, {

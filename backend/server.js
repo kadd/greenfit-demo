@@ -26,6 +26,8 @@ const blogRoute = require("./src/routes/blog");
 const termsRoute = require("./src/routes/terms");
 const privacyRoute = require("./src/routes/privacy");
 const impressumRoute = require("./src/routes/impressum");
+const gcsUploadRoutes = require("./src/routes/gcs-upload");
+const headerRoutes = require("./src/routes/header");
 
 // Upload Route (ohne Prefix, da spezifische Pfade)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -43,6 +45,8 @@ app.use("/api/blog", blogRoute);
 app.use("/api/terms", termsRoute);
 app.use("/api/privacy", privacyRoute);
 app.use("/api/impressum", impressumRoute);
+app.use("/api/gcs-upload", gcsUploadRoutes);
+app.use("/api/header", headerRoutes);
 
 // Root-Route
 app.get("/", (req, res) => {

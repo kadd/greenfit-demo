@@ -1,4 +1,10 @@
+import React from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+
 export default function AdminHeader() {
+  const { logout, token, isAuthenticated } = useAuth();
+
   return (
     <header className="w-full bg-gradient-to-r from-green-700 via-green-800 to-gray-900 text-white py-4 px-6 flex items-center justify-between shadow-lg">
       <div className="flex items-center gap-3">
@@ -22,9 +28,21 @@ export default function AdminHeader() {
           </svg>
           Webseite
         </a>
-        <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded transition font-semibold">
-          Logout
-        </button>
+        {isAuthenticated ? (
+          <button
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded transition font-semibold"
+            onClick={logout}
+          >
+            Logout
+          </button>
+        ): (
+          <Link
+            href="/admin/login"
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded transition font-semibold"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </header>
   );

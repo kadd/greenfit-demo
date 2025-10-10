@@ -12,47 +12,63 @@
     "navigation": {
       "home": {
         "label": "Home",
-        "href": "/"
+        "href": "/",
+        "isActive": true
       },
       "about": {
         "label": "Über uns",
-        "href": "/#about"
+        "href": "/#about",
+        "isActive": true
       },
       "services": {
         "label": "Leistungen",
-        "href": "/#services"
+        "href": "/#services",
+        "isActive": true
       },
       "team": {
         "label": "Team",
-        "href": "/#team"
+        "href": "/#team",
+        "isActive": true
+      },
+      "gallery": {
+        "label": "Galerie",
+        "href": "/#gallery",
+        "isActive": true
       },
       "testimonials": {
         "label": "Kundenstimmen",
-        "href": "/#testimonials"
+        "href": "/#testimonials",
+        "isActive": true
       },
       "contact": {
         "label": "Kontakt",
-        "href": "/#contact"
+        "href": "/#contact",
+        "isActive": true
       },
       "impressum": {
         "label": "Impressum",
-        "href": "/impressum"
+        "href": "/impressum",
+        "isActive": true
       },
       "datenschutz": {
         "label": "Datenschutz",
-        "href": "/privacy"
+        "href": "/privacy",
+        "isActive": true
       },
       "agb": {
         "label": "AGB",
-        "href": "/terms"
+        "href": "/terms",
+        "isActive": true
       },
       "faq": {
         "label": "FAQ",
-        "href": "/faq"
+        "href": "/faq",
+        "isActive": true
       },
       "blog": {
         "label": "Blog",
-        "href": "/blog"
+        "href": "/blog",
+        "isActive": true
       }
     }
   },
@@ -107,7 +123,7 @@
     }
   },
   "impressum": {
-    "label": "Impressum",
+    "label": "Impressum Kurztext für footer",
     "content": "Impressum: Musterstraße 1, 12345 Musterstadt"
   },
   "impressumLong": {
@@ -134,7 +150,7 @@
     ]
   },
   "privacy": {
-    "label": "Datenschutz",
+    "label": "Datenschutz Kurztext für footer",
     "content": "Datenschutz: Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften. Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage genutzt und nicht ohne Ihre ausdrückliche Zustimmung an Dritte weitergegeben. Weitere Informationen finden Sie in unserer Datenschutzerklärung."
   },
   "privacyLong": {
@@ -169,7 +185,7 @@
     ]
   },
   "terms": {
-    "label": "AGB",
+    "label": "AGB Kurztext für footer",
     "content": "Unsere Allgemeinen Geschäftsbedingungen finden Sie hier."
   },
   "termsLong": {

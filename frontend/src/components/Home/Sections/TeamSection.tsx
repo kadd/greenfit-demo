@@ -10,10 +10,16 @@ export default function TeamSection() {
   if (loading) return <p className="text-center">Lade Team-Mitglieder...</p>;
   if (!teams || teams.length === 0) return null;
 
+  // Filtere nur Teams, die mindestens ein Mitglied haben
+  const teamsWithMembers = teams.filter(team => team.members && team.members.length > 0);
+  
+  // Wenn keine Teams mit Mitgliedern vorhanden sind, zeige nichts an
+  if (teamsWithMembers.length === 0) return null;
+
   return (
     <section id="team" className="py-16 bg-gradient-to-b from-gray-50 via-white to-gray-100">
       <div className="max-w-5xl mx-auto px-4">
-        {teams.map(team => (
+        {teamsWithMembers.map(team => (
           <div key={team.id} className="mb-16">
             <div className="mb-10 text-center">
               <h3 className="text-3xl font-extrabold text-green-800 mb-2">{team.label}</h3>
@@ -28,7 +34,7 @@ export default function TeamSection() {
                   <div className="w-28 h-28 mb-4 rounded-full overflow-hidden border-4 border-green-200 shadow">
                     {member.photoSrc ? (
                       <img
-                        src={getPhotoUrl(uploadFolder, member.photoSrc)}
+                        src={member.photoSrc}
                         alt={member.name}
                         className="w-full h-full object-cover"
                       />

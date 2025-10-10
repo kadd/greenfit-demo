@@ -9,13 +9,14 @@ import { submitContactRequest as submitContactRequestService,
   fetchContactRequestsGroupedByEmail as fetchContactRequestsGroupedByEmailService,
   deleteContactRequestById as deleteContactRequestByIdService,
   replyToContactRequest as replyToContactRequestService,
-  addCommentToContactRequest as addCommentToContactRequestService,
+  addCommentToContactRequestById as addCommentToContactRequestByIdService,
   filterContactRequestsByEmail as filterContactRequestsByEmailService,
-  exportContactRequestsToCSV as exportContactRequestsToCSVService
+  exportContactRequestsToCSV as exportContactRequestsToCSVService,
+  updateContactRequestStatusById as updateContactRequestStatusByIdService
 } from "../services/contactRequests";
 
 
-export function useContact() {
+export function useContactRequests() {
   const [contactRequestSentStatus, setContactRequestSentStatus] = useState<string>("");
   const [contactRequests, setContactRequests] = useState<GroupedContactRequests>({});
   const [csvData, setCsvData] = useState<string>("");
@@ -105,10 +106,10 @@ export function useContact() {
     }
   }
 
-  async function addCommentToContactRequest(data: { id: string; comment: string }) {
+  async function addCommentToContactRequestById(data: { id: string; comment: string }) {
     try {
       setLoading(true);
-      const result = await addCommentToContactRequestService(data);
+      const result = await addCommentToContactRequestByIdService(data);
       if (!result.success) {
         setError(result.error || "Fehler beim Hinzufügen des Kommentars");
         throw new Error("Fehler beim Hinzufügen des Kommentars");
@@ -156,6 +157,52 @@ export function useContact() {
     }
   }
 
+  async function updateContactRequestStatusById(data: { id: string; status: ContactRequestStatus }) {
+    try {
+      setLoading(true);
+      const result = await updateContactRequestStatusByIdService(data);
+      if (!result.success) {
+        setError(result.error || "Fehler beim Aktualisieren des Status");
+        throw new Error("Fehler beim Aktualisieren des Status");
+      }
+      // Status im State aktualisieren
+      setContactRequests((prev) => {
+        const updated = { ...prev };
+        for (const email in updated) {
+          updated[email] = updated[email].map(msg =>
+            msg.id === data.id ? { ...msg, status: data.status } : msg
+          );
+        }
+        return updated;
+      });
+      setMessage(result.msg || "Status aktualisiert");
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchAllContactRequests() {
+    try {
+      setLoading(true);
+      const result = await fetchContactRequestsService();
+      setContactRequests(result);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function clearAllContactRequests() {
+    setContactRequests({});
+  }
+
+  // Initial load of contact requests
+  useEffect(() => {
+    fetchContactRequestsGroupedByEmailService();
+  }, []);
+
+  // Automatisches Zurücksetzen von Statusmeldungen nach 5 Sekunden
+
  useEffect(() => {
   if (contactRequestSentStatus) {
     const timer = setTimeout(() => {
@@ -167,9 +214,26 @@ export function useContact() {
   }
   fetchContactRequestsGroupedByEmailService().then(setContactRequests);
 }, [contactRequestSentStatus]);
-  return { contactRequestSentStatus, submitContactRequest, deleteContactRequestById, loading, 
+  return { 
+    contactRequestSentStatus, 
+    submitContactRequest, 
+    deleteContactRequestById, 
+    loading, 
     contactRequests, 
-    fetchContactRequestsGroupedByEmail, error, message, replyMessage, replyToContactRequest, 
-    addCommentToContactRequest, filterContactRequestsByEmail, exportContactRequestsToCSV  };
+    setContactRequests, 
+    csvData, 
+    setCsvData, 
+    fetchContactRequests, 
+    clearAllContactRequests,
+    fetchContactRequestsGroupedByEmail, 
+    error, 
+    message, 
+    replyMessage, 
+    replyToContactRequest, 
+    addCommentToContactRequestById, 
+    filterContactRequestsByEmail, 
+    exportContactRequestsToCSV, 
+    updateContactRequestStatusById 
+  };
 }
  

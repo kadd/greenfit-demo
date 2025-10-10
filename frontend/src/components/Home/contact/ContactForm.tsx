@@ -2,14 +2,14 @@ import React, { useState }  from "react";
 
 import FormSection from "../Sections/FormSection";
 
-import { useContact } from "@/hooks/useContactRequests";
+import { useContactRequests } from "@/hooks/useContactRequests";
 
 export default function ContactForm({info_message}: {info_message?: string}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const { contactRequestSentStatus, sendContactRequest, loading } = useContact();
+  const { contactRequestSentStatus, sendContactRequest, loading } = useContactRequests();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

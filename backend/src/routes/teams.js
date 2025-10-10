@@ -5,18 +5,8 @@ const path = require("path");
 
 const teamsPath = path.join(__dirname, "../data/teams.json");
 
-// Hilfsfunktionen
-const loadTeams = () => {
-  if (fs.existsSync(teamsPath)) {
-    const rawData = fs.readFileSync(teamsPath);
-    return JSON.parse(rawData);
-  }
-  return [];
-};
+const { loadTeams, saveTeams } = require("../utils/teams");
 
-const saveTeams = (teams) => {
-  fs.writeFileSync(teamsPath, JSON.stringify(teams, null, 2));
-};
 
 // Alle Teams abrufen
 router.get("/", (req, res) => {
@@ -138,6 +128,14 @@ router.post("/upload-photo/:teamId/:memberid", multer({ storage }).single("file"
   if (!team) return res.status(404).json({ error: "Team nicht gefunden." });
   const member = team.members.find(m => m.id === memberId);
   if (member && req.file) {
+    // Löschen des alten Fotos, falls vorhanden
+    if (member.photoSrc) {
+      const oldFilePath = path.join(__dirname, "../../uploads/team", member.photoSrc);
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+    // Neues Foto zuweisen
     member.photoSrc = req.file.filename;
     teamData.forEach(t => {
       if (t.id === teamId) {
@@ -145,6 +143,8 @@ router.post("/upload-photo/:teamId/:memberid", multer({ storage }).single("file"
       }
     });
     saveTeams(teamData);
+
+   
     res.json({ success: true, filename: req.file.filename });
   } else {
     res.status(400).json({ success: false, message: "Mitglied oder Datei fehlt." });

@@ -7,6 +7,7 @@ import { uploadFile as uploadFileService,
     getAreas as getAreasService,
     listFilesByArea as listFilesByAreaService,
     getFileUrl as getFileUrlService,
+    fetchPublicGallery as fetchPublicGalleryService
     
  } from '@/services/upload';
 
@@ -17,13 +18,30 @@ import { ContentData } from "@/types/contentData";
 import { get } from "http";
   
 
- export function useUpload(token) {
+ export function useUpload(token?: string) {
    const [files, setFiles] = React.useState([]);
    const [areas, setAreas] = useState<UploadArea[]>([]);
    const [loading, setLoading] = React.useState(false);
    const [error, setError] = React.useState(null);
+   const [gallery, setGallery] = React.useState(null);
+   
 
-   const { data: content } = useContent(token);
+   const { data: content } = useContent(token || "");
+
+   const fetchPublicGallery = async () => {
+      setLoading(true);
+      try {
+        const publicGallery = await fetchPublicGalleryService();
+        if(publicGallery.success)
+          setGallery(publicGallery.files || []);
+        return publicGallery;
+      } catch (err) {
+        setError(err);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+   };
 
    const fetchAllFiles = async () => {
      setLoading(true);
@@ -131,9 +149,20 @@ import { get } from "http";
                 console.log("Fetched Areas:", data);
             });
         }
+       
     }, [token]);
 
+    React.useEffect(() => {
+        fetchPublicGallery();
+    }, []);
+
+    React.useEffect(() => {
+        const extractedAreas = extractUploadAreas();
+        console.log("Extracted Upload Areas:", extractedAreas);
+    }, [content]);
+
    return {
+        gallery,
         files,
         loading,
         error,

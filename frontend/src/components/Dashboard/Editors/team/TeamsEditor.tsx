@@ -186,7 +186,7 @@ export default function TeamsEditor({
       {team.members.map((member: TeamMember, idx) => (
         <div key={member.id || idx} className="bg-gray-50 rounded-lg p-4 flex flex-col items-center shadow">
           <img
-            src={getPhotoUrl(uploadFolder, member.photoSrc)}
+            src={member.photoSrc}
             alt={member.name || "Teammitglied"}
             className="w-24 h-24 rounded-full mb-2 object-cover"
           />

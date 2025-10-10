@@ -83,6 +83,18 @@ router.get("/areas", (req, res) => {
   res.json({ success: true, areas });
 });
 
+router.get("/public_gallery", (req, res) => {
+  const area = "gallery";
+  let dirPath = path.join(__dirname, "../../uploads", area);
+
+  if (fs.existsSync(dirPath)) {
+    const files = fs.readdirSync(dirPath);
+    res.json({ success: true, files });
+  } else {
+    res.json({ success: true, files: [] });
+  }
+});
+
 // Allgemeiner Datei-Upload mit Angabe des Bereichs im Body
 router.post("/", upload.fields([{ name: "file" }, { name: "area" }]), (req, res) => {
     console.log(req.files, req.body);

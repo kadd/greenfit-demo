@@ -25,12 +25,12 @@ export async function getContactFormStatus() {
 }
 
 export async function fetchContactRequests() {
-  const res = await fetch(`${API_URL}/contacts`);
+  const res = await fetch(`${API_URL}`);
   return res.json();
 }
 
 export async function fetchContactRequestsGroupedByEmail() {
-  const res = await fetch(`${API_URL}/contacts/groupedByEmail`);
+  const res = await fetch(`${API_URL}/groupedByEmail`);
   return res.json();
 }
 
@@ -53,8 +53,8 @@ export async function replyToContactRequest(data: { email: string; subject: stri
 }
 
 // Kommentar zu einer Kontaktanfrage hinzufügen
-export async function addCommentToContactRequest(data: { id: string; comment: string }) {
-  const res = await fetch(`${API_URL}/comment`, {
+export async function addCommentToContactRequestById(data: { id: string; comment: string }) {
+  const res = await fetch(`${API_URL}/${data.id}/comment`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -84,7 +84,7 @@ export async function exportContactRequestsToCSV(requests: ContactRequest[]) {
 }
 
 // Kontaktstatus aktualisieren
-export async function updateContactRequestStatus(data: { date: string; status: "open" | "closed" | "in progress" }) {
+export async function updateContactRequestStatusById(data: { id: string; status: "open" | "closed" | "in progress" }) {
   const res = await fetch(`${API_URL}/status`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },

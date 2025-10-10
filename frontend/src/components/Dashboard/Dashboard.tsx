@@ -3,7 +3,6 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useContent } from "@/hooks/useContent";
-import { useContact } from "@/hooks/useContactRequests";
 
 import { ContentData } from "@/types/contentData";
 import DashboardForm from "@/components/ui/_dashboard/DashboardForm";
@@ -24,15 +23,14 @@ import UploadTab from "./Tabs/UploadTab";
 import TeamsTab from "./Tabs/TeamsTab";
 import ServicesTab from "./Tabs/ServicesTab";
 import FileUpload from "../ui/common/FileUpload";
+import { HeaderManagementTab } from "./Tabs/HeaderManagementTab";
 
 
 type Props = {};
 
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
-  const [activeTab, setActiveTab] = 
-  useState<"content" | "services" | "upload" | "contacts" | "blog"| "faq" | "terms" | "team"
-  | "impressum" | "privacy">("content");
+  const [activeTab, setActiveTab] = useState<"content" | "header" | "services" | "upload" | "contactrequests" | "blog" | "faq" | "terms" | "team" | "impressum" | "privacy">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
 
@@ -41,17 +39,6 @@ export default function ContentPage() {
     updateBlog, updateFaq, updateTerms, updatePrivacy, updateImpressum
    } = useContent(token || "");
 
-  const { contactRequests, deleteContactRequest, fetchContactRequestsGroupedByEmail } = useContact();
-
-  const onDelete = async (date: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await deleteContactRequest(date);
-      await fetchContactRequestsGroupedByEmail(); // <-- Funktion direkt aus dem Hook
-    } catch (error) {
-      console.error("Fehler beim Löschen der Nachricht:", error);
-    }
-  };  
 
   // Inhalte vom Backend holen
   useEffect(() => {
@@ -148,6 +135,12 @@ export default function ContentPage() {
               Dienstleistungen verwalten
             </button>
             <button
+              className={`py-2 px-4 font-semibold ${activeTab === "header" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("header")}
+            >
+              Header verwalten
+            </button>
+            <button
               className={`py-2 px-4 font-semibold ${activeTab === "team" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
               onClick={() => setActiveTab("team")}
             >
@@ -160,8 +153,8 @@ export default function ContentPage() {
               Uploads
             </button>
             <button
-              className={`py-2 px-4 font-semibold ${activeTab === "contacts" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
-              onClick={() => setActiveTab("contacts")}
+              className={`py-2 px-4 font-semibold ${activeTab === "contactrequests" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("contactrequests")}
             >
               Kontaktanfragen
             </button>
@@ -207,11 +200,14 @@ export default function ContentPage() {
         {activeTab === "services" && (
           <ServicesTab router={router} />
         )}
+        {activeTab === "header" && (
+          <HeaderManagementTab router={router} />
+        )}
         {activeTab === "team" && (
           <TeamsTab router={router} />
         )}
-        {activeTab === "contacts" && (
-          <ContactRequestsTab contacts={contactRequests} onDelete={onDelete} />
+        {activeTab === "contactrequests" && (
+          <ContactRequestsTab router={router} />
         )}
         {activeTab === "blog" && (
           <BlogTab

@@ -1,0 +1,22 @@
+import fs from "fs";
+import path from "path";
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+// Pfad zur teams.json Datei
+// const teamsPath = path.join(__dirname, "../data/teams.json"); --- IGNORE ---
+
+// Hilfsfunktionen
+
+export function loadTeams() {
+    const dataPath = path.join(__dirname, "../data/teams.json");    
+    if (fs.existsSync(dataPath)) {
+        const rawData = fs.readFileSync(dataPath);
+        return JSON.parse(rawData);
+    }
+    return [];
+}
+
+export function saveTeams(teams) {
+    const dataPath = path.join(__dirname, "../data/teams.json");
+    fs.writeFileSync(dataPath, JSON.stringify(teams, null, 2));
+}

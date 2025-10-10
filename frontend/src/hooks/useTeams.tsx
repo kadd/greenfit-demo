@@ -10,8 +10,12 @@ import {
   updateTeamMemberService,
   deleteTeamMemberService,
   uploadTeamMemberPhotoService,
-  deleteTeamMemberPhotoService,
+  deleteTeamMemberPhotoService
 } from "@/services/teams";
+
+import {  uploadTeammemberPhotoToGCSService,
+  deleteTeammemberPhotoFromGCSService
+ } from "@/services/gcsUploads";
 
 export function useTeams(token: string) {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -149,7 +153,8 @@ export function useTeams(token: string) {
   const uploadTeamMemberPhoto = async (teamId: string, memberId: string, file: File) => {
     setLoading(true);
     try {
-      const updatedMember = await uploadTeamMemberPhotoService(token, teamId, memberId, file);
+      //const updatedMember = await uploadTeamMemberPhotoService(token, teamId, memberId, file);
+      const updatedMember = await uploadTeammemberPhotoToGCSService(token, teamId, memberId, file);
       console.log("Uploaded member:", updatedMember);
       console.log("Upload folder:", uploadFolder);
       console.log("Photo URL:", getPhotoUrl(uploadFolder, updatedMember.filename));
@@ -160,7 +165,7 @@ export function useTeams(token: string) {
                 ...t,
                 members: Array.isArray(t.members)
                   ? t.members.map(m =>
-                      m.id === memberId ? { ...m, photoSrc: updatedMember.filename } : m
+                      m.id === memberId ? { ...m, photoSrc: updatedMember.url } : m
                     )
                   : []
 
