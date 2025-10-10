@@ -3,7 +3,10 @@ import { NavigationItem } from "./navigation";
 export interface HeaderData {
     title: string;
     subtitle: string;
-    cta: string;
+    cta: {
+        label: string;
+        href: string;
+    };
     logoSrc?: string;
     logoAlt?: string;
     backgroundImage?: string;

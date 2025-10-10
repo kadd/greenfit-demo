@@ -18,7 +18,10 @@ export const mapHeaderData = (data: any): HeaderData => {
   return {
     title: data.title || "",
     subtitle: data.subtitle || "",
-    cta: data.cta || "",
+    cta: {
+      label: data.cta?.label || "",
+      href: data.cta?.href || "",
+    },
     logoSrc: data.logoSrc,
     logoAlt: data.logoAlt,
     backgroundImage: data.backgroundImage,
@@ -37,6 +40,9 @@ const convertNavigationToArray = (nav: any): NavigationItem[] => {
       label: value.label || key,
       href: value.href || '#',
       isActive: value.isActive || false,
+      icon: value.icon || null,
+        children: value.children ? convertNavigationToArray(value.children) : undefined,
+        external: value.external || false,
       ...value
     }));
   }

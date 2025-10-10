@@ -1,8 +1,7 @@
 import React from "react";
 
-import { ContentData } from "@/types/contentData";
-import { useContentContext } from "@/contexts/contentContext";
-import { useAuth } from "@/hooks/useAuth";
+import NavigationLinks from "./NavigationLinks";
+
 
 type Props = {
   isAuthenticated: boolean;
@@ -10,9 +9,6 @@ type Props = {
 };
 
 export default function OverlayMenu({ isAuthenticated, onClose }: Props) {
-  const content = useContentContext();
-  if (!content) return null;
-
   return (
     <nav className="fixed inset-0 bg-black bg-opacity-60 z-40 flex flex-col items-center justify-center">
       <button
@@ -32,19 +28,13 @@ export default function OverlayMenu({ isAuthenticated, onClose }: Props) {
             <a href="/admin/login" onClick={onClose}>Login</a>
           </li>
         )}
-       {content.header?.navigation &&
-          Object.entries(content.header.navigation).map(([key, nav]) => (
-            <a
-              key={key}
-              href={nav.href}
-              className="px-3 py-2 rounded text-white hover:bg-green-800 transition font-semibold"
-            >
-              {nav.label}
-            </a>
-          ))
-        }
-       
         
+        <div className="flex flex-col space-y-4">
+          <NavigationLinks 
+            className="text-2xl font-bold justify-center" 
+            onLinkClick={onClose} 
+          />
+        </div>
       </ul>
     </nav>
   );

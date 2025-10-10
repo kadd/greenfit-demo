@@ -21,7 +21,7 @@ export async function uploadTeammemberPhotoToGCSService(token: string, teamId: s
   return res.json();
 };
 
-export async function uploadFileToGCSService(token: string, area: string, formData: FormData) {
+export async function uploadSingleFileToGCSService(token: string, area: string, formData: FormData) {
   const res = await fetch(`${API_URL}/upload/${area}`, {
     method: "POST",
     headers: {
@@ -32,6 +32,18 @@ export async function uploadFileToGCSService(token: string, area: string, formDa
   if (!res.ok) throw new Error(`Failed to upload file to GCS area ${area}`);
   return res.json();
 }
+
+export async function uploadFileToGCSService(token: string, area: string, formData: FormData) {
+  const res = await fetch(`${API_URL}/upload-to/${area}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  if (!res.ok) throw new Error(`Failed to upload file to GCS area ${area}`);
+  return res.json();
+} 
 
 export async function deleteFileFromGCSService(token: string, filename: string) {
   const res = await fetch(`${API_URL}/delete/${filename}`, {

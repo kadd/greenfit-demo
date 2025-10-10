@@ -1,6 +1,7 @@
 import React from "react";
 
 import {  uploadFileToGCSService,
+    uploadSingleFileToGCSService,
     deleteFileFromGCSService,
     listFilesInGCSService,
     getGCSFileUrlService,
@@ -26,6 +27,15 @@ export function useGCSUpload(token?: string) {
     
 
     const { data: content } = useContent(token || "");
+
+    // Initial fetch of areas and files
+    React.useEffect(() => {
+      if (token) {
+        getAreas();
+        fetchAllFiles();
+      }
+      fetchPublicGallery();
+    }, [token, areas, files]);
 
     const fetchPublicGallery = async () => {
        setLoading(true);
@@ -54,7 +64,23 @@ export function useGCSUpload(token?: string) {
       }
     };
 
-    const uploadFile = async (area: string, formData: FormData) => {
+    const uploadSingleFile = async (area: string, formData: FormData) => {
+      setLoading(true);
+      try {
+        const response = await uploadSingleFileToGCSService(token, area, formData);
+        if (response && response.success) {
+          await getAreas(); // Aktualisiere die Dateiliste nach dem Upload
+        }
+        return response;
+      } catch (err) {
+        setError(err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const uploadFileToArea = async (area: string, formData: FormData) => {
       setLoading(true);
       try {
         const response = await uploadFileToGCSService(token, area, formData);
@@ -110,14 +136,7 @@ export function useGCSUpload(token?: string) {
         }
     };
 
-    // Initial fetch of areas and files
-    React.useEffect(() => {
-      if (token) {
-        getAreas();
-        fetchAllFiles();
-      }
-      fetchPublicGallery();
-    }, [token]);
+    
 
     return {
       files,
@@ -125,7 +144,8 @@ export function useGCSUpload(token?: string) {
       gallery,
       loading,
       error,
-      uploadFile,
+      uploadSingleFile,
+      uploadFileToArea,
       deleteFile,
       getFileUrl,
       fetchAllFiles,

@@ -3,7 +3,9 @@ import React, { use, useEffect } from "react";
 import { HeaderData } from "../types/header";
 import { NavigationItem } from "../types/navigation";
 
-import { fetchHeaderData, updateHeaderData } from "../services/header";
+import { fetchHeaderData, updateHeaderData,
+  resetHeaderData, setGalleryInactiveIfEmpty
+ } from "../services/header";
 
 
 // Custom hook to manage header state
@@ -20,6 +22,7 @@ export function useHeader(initialHeader: HeaderData) {
       }
     };
     fetchHeader();
+    setGalleryStatus();
   }, []);
 
   const fetchHeader = async () => {
@@ -42,9 +45,18 @@ export function useHeader(initialHeader: HeaderData) {
 
   const resetHeader = () => {
     setHeader(initialHeader);
+  };  
+
+  const setGalleryStatus = async () => {
+    try {
+      const result = await setGalleryInactiveIfEmpty();
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  return { header, updateHeader, resetHeader };
+  return { header, updateHeader, resetHeader, setGalleryStatus };
 }
 
 // Helper function to find a navigation item by its ID

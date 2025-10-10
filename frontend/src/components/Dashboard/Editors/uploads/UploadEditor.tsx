@@ -2,6 +2,7 @@ import React, { use, useState } from "react";
 
 
 import { useGCSUpload } from "@/hooks/useGCSUpload";
+import { useHeader } from "@/hooks/useHeader";
 
 import  { UploadArea } from "@/types/uploadArea";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,7 +23,8 @@ export default function UploadEditor({ onUpload }) {
   const [msg, setMsg] = useState("");
   const { token } = useAuth();
 
-  const { areas, files, uploadFile, deleteFile, getAreas } = useGCSUpload(token);
+  const { areas, files, uploadFileToArea, uploadSingleFile, deleteFile, getAreas } = useGCSUpload(token);
+  const { setGalleryStatus } = useHeader({ title: "", subtitle: "", backgroundImage: "" });
   //const { areas, files, uploadFileToGCS, deleteFileFromGCS, getAreas } = useGCSUpload(token);
 
   const handleAreaChange = (e) => {
@@ -30,6 +32,7 @@ export default function UploadEditor({ onUpload }) {
     setFile(null);
     setMsg("");
   };
+
 
   const handleFileChange = (areaKey: string, e: React.ChangeEvent<HTMLInputElement>) => {
   if (e.target.files && e.target.files[0]) {
@@ -52,6 +55,9 @@ const handleUploadDirect = async (areaKey: string, file: File) => {
       setMsg("✅ Upload erfolgreich!");
       setFilesToUpload(prev => ({ ...prev, [areaKey]: null }));
       await getAreas();
+      await setGalleryStatus();
+      
+      if (onUpload) onUpload(); // Callback nach erfolgreichem Upload
     } else {
       setMsg("❌ Upload fehlgeschlagen");
     }

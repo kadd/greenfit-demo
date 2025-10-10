@@ -5,14 +5,20 @@ import { useRouter } from "next/navigation";
 
 import { useContentContext } from "@/contexts/contentContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useHeader } from "@/hooks/useHeader";
 import HamburgerButton from "./HamburgerButton";
 import OverlayMenu from "./OverlayMenu";
+import { HeaderData } from "@/types/header";
+import { NavigationItem } from "@/types/navigation";
+import { mapHeaderData, getEmptyHeaderData } from "@/utils/mapHeaderData";
+
+import NavigationLinks from "./NavigationLinks";
 
 export default function Menu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const { content } = useContentContext();
- 
+  const { header } = useHeader(getEmptyHeaderData());
   const router = useRouter();
 
   useEffect(() => {
@@ -38,27 +44,9 @@ export default function Menu() {
           </a>
         </div>
 
-        {/* Navigation mittig */}
+      {/* Navigation mittig */}
         <div className="hidden md:flex justify-center items-center space-x-8">
-          {content.header?.navigation &&
-            Object.entries(content.header.navigation).map(([key, nav]) => (
-              nav.href.startsWith("/#") ? (
-                <Link key={key} href={nav.href} scroll={true}>
-                  <span className="px-3 py-2 rounded text-white hover:bg-green-800 transition font-semibold cursor-pointer whitespace-nowrap flex items-center">
-                    {nav.label}
-                  </span>
-                </Link>
-              ) : (
-                <a
-                  key={key}
-                  href={nav.href}
-                  className="px-3 py-2 rounded text-white hover:bg-green-800 transition font-semibold whitespace-nowrap flex items-center"
-                >
-                  {nav.label}
-                </a>
-              )
-            ))
-          }
+          <NavigationLinks />
         </div>
 
         {/* Dashboard/Login ganz rechts */}
@@ -91,7 +79,6 @@ export default function Menu() {
         <OverlayMenu
           isAuthenticated={isAuthenticated}
           onClose={() => setMenuOpen(false)}
-          headerLinks={content.header}
         />
       )}
     </header>
