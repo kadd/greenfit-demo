@@ -1,8 +1,14 @@
 import { FAQ, FAQItem } from "../types/faq";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL + '/faq'
-  : "http://localhost:5001/api/faq";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/faq`;
+  }
+  return "http://localhost:5001/api/faq";
+};
+
+const API_URL = getApiUrl();
   
 export async function fetchFAQ() {
   try {

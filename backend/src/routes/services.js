@@ -4,6 +4,10 @@ const fs = require("fs");
 const path = require("path");
 const { getServices } = require("../controllers/servicesController");
 
+const { backupData } = require("../utils/data");
+
+// Hilfsfunktion zum Laden der aktuellen services.json
+
 const loadServicesData = () => {
   const filePath = path.join(__dirname, "../data/services.json");
   if (fs.existsSync(filePath)) {
@@ -77,6 +81,14 @@ router.put("/", (req, res) => {
   services.id = services.id || `services-${Date.now()}`;
   services.updatedAt = new Date().toISOString();
 
+  // Backup der aktuellen Daten vor dem Speichern
+  backupData().then((backupPath) => {
+    console.log("Backup erstellt unter:", backupPath);
+  }).catch((err) => {
+    console.error("Fehler beim Erstellen des Backups:", err);
+  });
+
+  // Speichere die Services
   fs.writeFile(servicesPath, JSON.stringify(services, null, 2), (writeErr) => {
     isWriting = false;
     if (writeErr) {
@@ -155,6 +167,13 @@ router.post("/:contentKey", (req, res) => {
 
   // Aktualisiere das updatedAt-Feld
   servicesData.updatedAt = new Date().toISOString();
+
+  // Backup der aktuellen Daten vor dem Speichern
+  backupData().then((backupPath) => {
+    console.log("Backup erstellt unter:", backupPath);
+  }).catch((err) => {
+    console.error("Fehler beim Erstellen des Backups:", err);
+  });
 
   fs.writeFile(servicesPath, JSON.stringify(servicesData, null, 2), (writeErr) => {
     if (writeErr) {

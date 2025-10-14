@@ -3,6 +3,8 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 
+const { backupData } = require("../utils/data");
+
 
 //get entire FAQ
 router.get('/', (req, res) => {
@@ -87,8 +89,14 @@ router.put('/', (req, res) => {
   // Aktualisiere das FAQ-Datum
   faq.updatedAt = new Date().toISOString();
 
-  // Speichere die FAQ
+  // Backup der aktuellen Daten vor dem Speichern
+  backupData().then((backupPath) => {
+    console.log("Backup erstellt unter:", backupPath);
+  }).catch((err) => {
+    console.error("Fehler beim Erstellen des Backups:", err);
+  });
 
+  // Speichere die FAQ
   fs.writeFile(faqPath, JSON.stringify(faq, null, 2), (writeErr) => {
     isWriting = false;
     if (writeErr) {
@@ -196,6 +204,13 @@ router.put('/items/:id', (req, res) => {
 
     // Aktualisiere das FAQ-Datum
     faqs.updatedAt = new Date().toISOString();
+
+    // Backup der aktuellen Daten vor dem Speichern
+    backupData().then((backupPath) => {
+      console.log("Backup erstellt unter:", backupPath);
+    }).catch((err) => {
+      console.error("Fehler beim Erstellen des Backups:", err);
+    });
 
     fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
       if (writeErr) {

@@ -1,8 +1,14 @@
 import { Blog, BlogItem } from "../types/blog";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL + '/blog'
-  : "http://localhost:5001/api/blog";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/blog`;
+  }
+  return "http://localhost:5001/api/blog";
+};
+
+const API_URL = getApiUrl();
 
 
 // Fetch all blog data

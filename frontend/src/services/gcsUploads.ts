@@ -1,5 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/gcs-upload' || "http://localhost:5000/api/gcs-upload";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/gcs-upload`;
+  }
+  return "http://localhost:5001/api/gcs-upload";
+};
 
+const API_URL = getApiUrl();
 export async function fetchPublicGalleryFromGCSService() {
   const res = await fetch(`${API_URL}/public_gallery`);
   if (!res.ok) throw new Error("Failed to fetch public gallery from GCS");

@@ -8,7 +8,22 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 app.use(cors());
-app.use(express.json());
+
+// ✅ CORS Fix für alle Routes
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl}`);
+  
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+  
+  if (req.method === 'OPTIONS') {
+    console.log('✅ Preflight OPTIONS request handled:', req.originalUrl);
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -28,6 +43,7 @@ const privacyRoute = require("./src/routes/privacy");
 const impressumRoute = require("./src/routes/impressum");
 const gcsUploadRoutes = require("./src/routes/gcs-upload");
 const headerRoutes = require("./src/routes/header");
+const navigationRoutes = require("./src/routes/navigation");
 
 // Upload Route (ohne Prefix, da spezifische Pfade)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -47,6 +63,7 @@ app.use("/api/privacy", privacyRoute);
 app.use("/api/impressum", impressumRoute);
 app.use("/api/gcs-upload", gcsUploadRoutes);
 app.use("/api/header", headerRoutes);
+app.use("/api/navigation", navigationRoutes);
 
 // Root-Route
 app.get("/", (req, res) => {

@@ -1,229 +1,375 @@
+// backend/src/routes/privacy.js - Refactored mit zentralem WriteManager
 const express = require('express');
 const router = express.Router();
-const path = require('path');
-const fs = require('fs');
+const fileOps = require('../services/fileOperations');
 
-router.get('/', (req, res) => {
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log("Loading Privacy from:", privacyPath);
-  fs.readFile(privacyPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Privacy konnten nicht geladen werden.' });
-    }
-    try {
-      const privacy = JSON.parse(data);
-      res.json(privacy);
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Privacy-Daten sind ungültig.' });
-    }
-  });
-});
+const PRIVACY_FILE = '../data/privacy.json';
 
-// create empty privacy
-router.post('/create', (req, res) => {
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log(`Creating empty privacy in:`, privacyPath);
-  const emptyPrivacy = { title: "Datenschutz", isPage: true, description: "Beschreibung der Datenschutzrichtlinie", updatedAt: new Date().toISOString(), sections: [] };
-  
-  // Füge eine ID und ein Erstellungsdatum hinzu
-  emptyPrivacy.id = "privacy-" + Date.now();
-  emptyPrivacy.createdAt = new Date().toISOString();
-  emptyPrivacy.updatedAt = emptyPrivacy.createdAt;
-
-  fs.writeFile(privacyPath, JSON.stringify(emptyPrivacy, null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'Privacy konnten nicht erstellt werden.' });
-    }
-    res.status(201).json(emptyPrivacy);
-  });
-});
-
-// Prevent concurrent writes
-let isWriting = false;
-
-// Update entire privacy
-router.put('/', (req, res) => {
-  if (isWriting) {
-    return res.status(429).json({ error: 'Bitte warte, die Privacy wird gerade gespeichert.' });
-  }
-  isWriting = true;
-  const privacy = req.body;
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log(`Updating entire privacy in:`, privacyPath);
-
-  // id zu sections hinzufügen
-  privacy.sections = privacy.sections.map((section, index) => ({
-    ...section,
-    id: section.id || `section-${index + 1}`
-  }));
-
-  // Optional: Validierung
-  if (!privacy || typeof privacy.title !== 'string' || !Array.isArray(privacy.sections)) {
-    isWriting = false;
-    return res.status(400).json({ error: 'Ungültige Privacy-Daten.' });
-  }
-
-  // Aktualisiere das updatedAt-Feld
-  privacy.updatedAt = new Date().toISOString();
-
-  // Speichere die Privacy
-  fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
-    isWriting = false;
-    if (writeErr) {
-      return res.status(500).json({ error: 'Privacy konnten nicht gespeichert werden.' });
-    }
-
+// Get entire privacy policy
+router.get('/', async (req, res) => {
+  try {
+    const privacy = await fileOps.readJsonFile(PRIVACY_FILE);
     res.json(privacy);
-  });
+  } catch (error) {
+    console.error('Error fetching privacy:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Laden der Datenschutzbestimmungen',
+      details: error.message 
+    });
+  }
 });
 
-// Delete entire privacy
-router.delete('/', (req, res) => {
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log(`Deleting entire privacy in:`, privacyPath);
-  fs.writeFile(privacyPath, JSON.stringify({ title: "Datenschutz", isPage: true, description: "Beschreibung der Datenschutzrichtlinie", updatedAt: new Date().toISOString(), sections: [] }, null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'Privacy konnten nicht gelöscht werden.' });
-    }
-    res.json({ message: 'Privacy wurde gelöscht.' });
-  });
-}); 
-
-// add new privacy section
-router.post('/section', (req, res) => {
-  const newSection = req.body;
-  if (!newSection || typeof newSection.heading !== 'string' || typeof newSection.text !== 'string') {
-    return res.status(400).json({ error: 'Ungültige Sektion-Daten.' });
+// Create empty privacy policy
+router.post('/', async (req, res) => {
+  try {
+    const { title = "Datenschutzerklärung", description = "Datenschutzbestimmungen" } = req.body;
+    
+    const emptyPrivacy = { 
+      title,
+      isPage: true, 
+      description,
+      sections: [],
+      createdAt: new Date().toISOString()
+    };
+    
+    const result = await fileOps.writeJsonFile(PRIVACY_FILE, emptyPrivacy, {
+      backup: true,
+      validate: true
+    });
+    
+    res.status(201).json(result);
+  } catch (error) {
+    console.error('Error creating privacy:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Erstellen der Datenschutzbestimmungen',
+      details: error.message 
+    });
   }
+});
 
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log(`Adding new section to privacy in:`, privacyPath);
-  fs.readFile(privacyPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Privacy konnten nicht geladen werden.' });
+// Update entire privacy policy
+router.put('/', async (req, res) => {
+  try {
+    const privacy = req.body;
+    
+    // Input validation
+    if (!privacy.title) {
+      return res.status(400).json({ 
+        error: 'Titel ist erforderlich' 
+      });
     }
 
-    let privacy;
-    try {
-      privacy = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'Privacy-Daten sind ungültig.' });
+    if (!Array.isArray(privacy.sections)) {
+      return res.status(400).json({ 
+        error: 'Sections müssen ein Array sein' 
+      });
     }
     
-    const sectionWithId = { ...newSection, id: `section-${privacy.sections.length + 1}` };
-    privacy.sections.push(sectionWithId);
+    // Sections mit IDs versehen falls nicht vorhanden
+    privacy.sections = privacy.sections.map((section, index) => ({
+      ...section,
+      id: section.id || `section-${Date.now()}-${index}`,
+      updatedAt: new Date().toISOString()
+    }));
 
-    // Aktualisiere das updatedAt-Feld
-    privacy.updatedAt = new Date().toISOString();
-
-    // Speichere die aktualisierten Privacy-Daten
-
-    fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'Privacy konnten nicht gespeichert werden.' });
-      }
-      res.status(201).json(sectionWithId);
+    const result = await fileOps.writeJsonFile(PRIVACY_FILE, privacy, {
+      backup: true,
+      validate: true
     });
-  });
-});
-
-// get single privacy section by id
-router.get('/:id', (req, res) => {
-  const sectionId = req.params.id;
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log(`Loading privacy section ${sectionId} from:`, privacyPath);
-  fs.readFile(privacyPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Privacy konnten nicht geladen werden.' });
-    }
-    try {
-      const privacy = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'Privacy-Daten sind ungültig.' });
-    }
-    try {
-      const privacy = JSON.parse(data);
-      const section = privacy.sections.find(s => s.id === sectionId);
-      if (!section) {
-        return res.status(404).json({ error: 'Sektion nicht gefunden.' });
-      }
-      res.json(section);
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Fehler beim Laden des Abschnitts.' });
-    }
-  });
-});
-
-// update single privacy section by id
-router.put('/:id', (req, res) => {
-  const sectionId = req.params.id;
-  const updatedSection = req.body;
-  if (!updatedSection || typeof updatedSection.heading !== 'string' || typeof updatedSection.text !== 'string') {
-    return res.status(400).json({ error: 'Ungültige Abschnittsdaten.' });
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error updating privacy:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Aktualisieren der Datenschutzbestimmungen',
+      details: error.message 
+    });
   }
-
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  fs.readFile(privacyPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Privacy konnten nicht geladen werden.' });
-    }
-    let privacy;
-    try {
-      privacy = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'Privacy-Daten sind ungültig.' });
-    }
-    const sectionIndex = privacy.sections.findIndex(sec => sec.id === sectionId);
-    if (sectionIndex === -1) {
-      return res.status(404).json({ error: 'Sektion nicht gefunden.' });
-    }
-    privacy.sections[sectionIndex] = { id: sectionId, ...updatedSection };
-
-    // Aktualisiere das updatedAt-Feld
-    privacy.updatedAt = new Date().toISOString();
-
-    // Speichere die aktualisierten Privacy-Daten
-    fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'Sektion konnte nicht aktualisiert werden.' });
-      }
-      res.json(privacy.sections[sectionIndex]);
-    });
-  });
 });
 
-// delete single privacy section by id
-router.delete('/:id', (req, res) => {
-  const sectionId = req.params.id;
-  const privacyPath = path.join(__dirname, '../data/privacy.json');
-  console.log(`Deleting privacy section ${sectionId} in:`, privacyPath);
-  fs.readFile(privacyPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Privacy konnten nicht geladen werden.' });
-    }
-    let privacy;
-    try {
-      privacy = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'Privacy-Daten sind ungültig.' });
-    }
-    const sectionIndex = privacy.sections.findIndex(sec => sec.id === sectionId);
-    if (sectionIndex === -1) {
-      return res.status(404).json({ error: 'Sektion nicht gefunden.' });
-    }
-    privacy.sections.splice(sectionIndex, 1);
-
-    // Aktualisiere das updatedAt-Feld
-    privacy.updatedAt = new Date().toISOString();
-
-    // Speichere die aktualisierten Privacy-Daten
-    fs.writeFile(privacyPath, JSON.stringify(privacy, null, 2), (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'Sektion konnte nicht gelöscht werden.' });
-      }
-      res.json({ message: 'Sektion wurde gelöscht.' });
+// Delete entire privacy policy
+router.delete('/', async (req, res) => {
+  try {
+    const emptyPrivacy = { 
+      title: "Datenschutzerklärung", 
+      isPage: true, 
+      description: "Datenschutzbestimmungen", 
+      sections: [],
+      deletedAt: new Date().toISOString()
+    };
+    
+    await fileOps.writeJsonFile(PRIVACY_FILE, emptyPrivacy, {
+      backup: true
     });
-  });
+    
+    res.json({ 
+      message: 'Datenschutzbestimmungen wurden zurückgesetzt' 
+    });
+  } catch (error) {
+    console.error('Error deleting privacy:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Löschen der Datenschutzbestimmungen',
+      details: error.message 
+    });
+  }
+});
+
+// reset privacy to default
+router.post('/reset', async (req, res) => {
+  try {
+    const defaultPrivacy = { 
+      title: "Datenschutzerklärung", 
+      isPage: true, 
+      description: "Datenschutzbestimmungen", 
+      sections: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    const result = await fileOps.writeJsonFile(PRIVACY_FILE, defaultPrivacy, {
+      backup: true,
+      validate: true
+    });
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error resetting privacy:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Zurücksetzen der Datenschutzbestimmungen',
+      details: error.message 
+    });
+  }
+});
+
+// ==================== INDIVIDUAL SECTION MANAGEMENT ====================
+// Refactored mit zentralem WriteManager in fileOperations.js
+
+// backend/src/services/fileOperations.js - Zentraler WriteManager
+// ==================== INDIVIDUAL SECTION MANAGEMENT ====================
+
+// ==================== SECTIONS MANAGEMENT ====================
+
+// Get single section by ID
+router.get('/sections/:id', async (req, res) => {
+  try {
+    const sectionId = req.params.id;
+    const privacy = await fileOps.readJsonFile(PRIVACY_FILE);
+    
+    const section = privacy.sections.find(sec => sec.id === sectionId);
+    if (!section) {
+      return res.status(404).json({ 
+        error: 'Datenschutzabschnitt nicht gefunden' 
+      });
+    }
+    
+    res.json(section);
+  } catch (error) {
+    console.error('Error fetching privacy section:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Laden des Datenschutzabschnitts',
+      details: error.message 
+    });
+  }
+});
+
+// Create new section
+// backend/src/routes/privacy.js - POST Route erweitern:
+
+// Create new section
+router.post('/sections', async (req, res) => {
+  try {
+    console.log('=== CREATE SECTION DEBUG ===');
+    console.log('Request body:', req.body);
+    console.log('Headers:', req.headers.authorization ? 'Auth present' : 'No auth');
+    
+    const { heading = "Neue Überschrift", text = "Neuer Text" } = req.body;
+    
+    if (!heading.trim() || !text.trim()) {
+      return res.status(400).json({ 
+        error: 'Heading und Text sind erforderlich und dürfen nicht leer sein' 
+      });
+    }
+
+    console.log('Starting updateJsonFile...');
+    
+    const result = await fileOps.updateJsonFile(PRIVACY_FILE, (privacy) => {
+      console.log('Inside updateJsonFile callback');
+      console.log('Current sections:', privacy.sections.length);
+      
+      const newSection = { 
+        id: `section-${Date.now()}`, 
+        heading: heading.trim(),
+        text: text.trim(),
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log('Creating new section:', newSection.id);
+      privacy.sections.push(newSection);
+      console.log('New sections count:', privacy.sections.length);
+      console.log('Returning updated privacy...');
+      return privacy;
+    }, {
+      backup: true,
+      validate: true
+    });
+
+    console.log('✅ updateJsonFile completed successfully!');
+    console.log('Result sections count:', result.sections.length);
+
+    // Neue Section zurückgeben
+    const newSection = result.sections[result.sections.length - 1];
+    console.log('Sending response with new section:', newSection.id);
+    
+    res.status(201).json(newSection);
+    console.log('✅ Response sent successfully!');
+    
+  } catch (error) {
+    console.error('❌ Error in CREATE SECTION:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Fehler beim Hinzufügen des Datenschutzabschnitts',
+      details: error.message 
+    });
+  }
+});
+
+// Update single section
+router.put('/sections/:id', async (req, res) => {
+  try {
+    const sectionId = req.params.id;
+    const { heading, text } = req.body;
+
+    if (!heading?.trim() || !text?.trim()) {
+      return res.status(400).json({ 
+        error: 'Heading und Text sind erforderlich und dürfen nicht leer sein' 
+      });
+    }
+
+    const result = await fileOps.updateJsonFile(PRIVACY_FILE, (privacy) => {
+      const sectionIndex = privacy.sections.findIndex(sec => sec.id === sectionId);
+      if (sectionIndex === -1) {
+        throw new Error('Datenschutzabschnitt nicht gefunden');
+      }
+      
+      privacy.sections[sectionIndex] = { 
+        ...privacy.sections[sectionIndex],
+        heading: heading.trim(),
+        text: text.trim(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      return privacy;
+    }, {
+      backup: true,
+      validate: true
+    });
+
+    const updatedSection = result.sections.find(sec => sec.id === sectionId);
+    res.json(updatedSection);
+  } catch (error) {
+    console.error('Error updating privacy section:', error);
+    
+    if (error.message === 'Datenschutzabschnitt nicht gefunden') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ 
+        error: 'Fehler beim Aktualisieren des Datenschutzabschnitts',
+        details: error.message 
+      });
+    }
+  }
+});
+
+// Delete section
+router.delete('/sections/:id', async (req, res) => {
+  try {
+    const sectionId = req.params.id;
+    console.log(`Request to delete privacy section ID: ${sectionId}`);
+
+    const result = await fileOps.updateJsonFile(PRIVACY_FILE, (privacy) => {
+      const sectionIndex = privacy.sections.findIndex(sec => sec.id === sectionId);
+      if (sectionIndex === -1) {
+        throw new Error('Datenschutzabschnitt nicht gefunden');
+      }
+      
+      // Section mit Backup-Info vor dem Löschen
+      const deletedSection = privacy.sections[sectionIndex];
+      console.log(`Deleting privacy section: ${deletedSection.heading} (ID: ${sectionId})`);
+      
+      privacy.sections.splice(sectionIndex, 1);
+      console.log(`Privacy section ID ${sectionId} deleted successfully.`);
+      console.log('Remaining sections:', privacy.sections.map(sec => sec.id));
+      return privacy;
+    }, {
+      backup: true // Wichtig: Backup vor Löschung
+    });
+
+    // ✅ FIX: 204 No Content statt 200 mit JSON Body
+    res.status(204).send(); // ← Leere Antwort bei erfolgreichem DELETE
+
+  } catch (error) {
+    console.error('Error deleting privacy section:', error);
+    
+    if (error.message === 'Datenschutzabschnitt nicht gefunden') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ 
+        error: 'Fehler beim Löschen des Datenschutzabschnitts',
+        details: error.message 
+      });
+    }
+  }
+});
+
+// ==================== BULK OPERATIONS ====================
+
+// Reorder sections
+router.put('/sections/reorder', async (req, res) => {
+  try {
+    const { sectionIds } = req.body;
+    
+    if (!Array.isArray(sectionIds)) {
+      return res.status(400).json({ 
+        error: 'sectionIds muss ein Array sein' 
+      });
+    }
+
+    const result = await fileOps.updateJsonFile(PRIVACY_FILE, (privacy) => {
+      const reorderedSections = [];
+      
+      // Sections in der gewünschten Reihenfolge anordnen
+      sectionIds.forEach(id => {
+        const section = privacy.sections.find(sec => sec.id === id);
+        if (section) {
+          reorderedSections.push({
+            ...section,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      });
+      
+      // Prüfen ob alle Sections gefunden wurden
+      if (reorderedSections.length !== privacy.sections.length) {
+        throw new Error('Nicht alle Abschnitte konnten neu angeordnet werden');
+      }
+      
+      privacy.sections = reorderedSections;
+      return privacy;
+    }, {
+      backup: true
+    });
+
+    res.json({ 
+      message: 'Abschnitte wurden neu angeordnet',
+      sections: result.sections
+    });
+  } catch (error) {
+    console.error('Error reordering privacy sections:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Neuanordnen der Datenschutzabschnitte',
+      details: error.message 
+    });
+  }
 });
 
 module.exports = router;

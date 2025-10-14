@@ -1,6 +1,14 @@
 import { Team, TeamMember } from "@/types/team";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL + "/teams" || "http://localhost:5001/api/teams";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/teams`;
+  }
+  return "http://localhost:5001/api/teams";
+};
+
+const API_URL = getApiUrl();
 
 // Alle Teams abrufen
 export const fetchTeamsService = async () => {

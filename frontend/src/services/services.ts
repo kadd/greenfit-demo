@@ -1,6 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL + '/services'
-  : "http://localhost:5001/api/services";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/services`;
+  }
+  return "http://localhost:5001/api/services";
+};
+
+const API_URL = getApiUrl();
 
 export async function getServiceObjectService(token?: string) {
   // ohne Token, wenn öffentlich zugänglich

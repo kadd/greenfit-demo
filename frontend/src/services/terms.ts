@@ -1,8 +1,14 @@
 import { TermsSection } from "@/types/terms";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL + '/terms'
-  : "http://localhost:5001/api/terms";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/terms`;
+  }
+  return "http://localhost:5001/api/terms";
+};
+
+const API_URL = getApiUrl();
 
 export async function fetchTerms() {
   try {
@@ -73,17 +79,6 @@ export function createTermsSection(terms: Partial<Terms>, heading = "Neue Übers
     text
   };
   return { ...terms, sections: [...terms.sections, newSection] };
-}
-
-// fetch single terms section by ID
-export async function fetchTermsSectionById(sectionId: string) {
-  try {
-    const res = await fetch(`${API_URL}/${sectionId}`);
-    if (!res.ok) throw new Error("Fehler beim Laden des AGB-Abschnitts");
-    return await res.json(); // einzelner AGB-Abschnitt
-  } catch (err) {
-    throw new Error("Fehler beim Laden des AGB-Abschnitts");
-  }
 }
 
 // delete single terms section by ID

@@ -12,9 +12,19 @@ interface HeaderManagementTabProps {
 
 export function HeaderManagementTab({ router }: HeaderManagementTabProps) {
   // Fallback-Header mit leerer Navigation
-  const defaultHeader: HeaderData = getEmptyHeaderData();
+  // Hook verwenden - States sind darin!
+  const { 
+    header, 
+    loading, 
+    error, 
+    uploading, 
+    resetHeader,
+    updateHeader, 
+    uploadHeaderImage 
+  } = useHeader(getEmptyHeaderData());
 
-  const { header, updateHeader, resetHeader } = useHeader(defaultHeader);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
   const [editForm, setEditForm] = React.useState(header);
 
@@ -32,6 +42,48 @@ export function HeaderManagementTab({ router }: HeaderManagementTabProps) {
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validierung
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Bitte wählen Sie eine Bilddatei aus.');
+      return;
+    }
+
+    // Größe prüfen (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Datei ist zu groß. Maximum: 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null); // Error zurücksetzen
+
+    try {
+      console.log('Uploading file:', file.name, file.type, file.size); // Debug
+      const result = await uploadHeaderImage(file);
+      // editForm mit neuer URL aktualisieren
+      console.log('Upload result:', result); // Debug
+      if (result?.url) {
+        setEditForm({ ...editForm, backgroundImage: result.url });
+      }
+    } catch (error) {
+       console.error('Upload error:', error);
+      setUploadError(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
+    } finally {
+      setIsUploading(false);
+    }
+
+  };
+
+  const removeBackgroundImage = () => {
+    setEditForm({ ...editForm, backgroundImage: '' });
+    setUploadError(null); // Upload Error zurücksetzen
+  };
+
+
   const handleCancel = () => {
     setEditForm(header);
     setIsEditing(false);
@@ -44,7 +96,8 @@ export function HeaderManagementTab({ router }: HeaderManagementTabProps) {
       href: "#",
       isActive: false
     };
-    const updatedNavigation = addNavigationItem(mapHeaderData(editForm).navigation || [], newItem);
+    
+  const updatedNavigation = addNavigationItem(mapHeaderData(editForm).navigation || [], newItem);
     setEditForm({ ...editForm, navigation: updatedNavigation });
   };
 
@@ -65,7 +118,11 @@ export function HeaderManagementTab({ router }: HeaderManagementTabProps) {
 
   return (
     <div className="header-management">
-     <div className="flex justify-between items-center mb-6">
+      {loading && <div>Lädt...</div>}
+      {error && <div className="error">{error}</div>}
+      {uploading && <div>Upload läuft...</div>}
+
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Header Verwaltung</h2>
         <div className="space-x-2">
           {!isEditing ? (
@@ -143,23 +200,118 @@ export function HeaderManagementTab({ router }: HeaderManagementTabProps) {
               <p className="text-gray-700">{header.cta}</p>
             )}
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Hintergrundbild URL</label>
+          {/* Hintergrundbild Section */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium mb-2">
+              Hintergrundbild
+              <span className="text-gray-500 text-xs ml-2">
+                (Empfohlen: 1920x1080px, max. 5MB)
+              </span>
+            </label>
+            {/* Aktuelles Bild anzeigen */}
+            {editForm.backgroundImage && (
+              <div className="mb-4">
+                <div className="relative">
+                  <img
+                    src={editForm.backgroundImage}
+                    alt="Header Hintergrundbild Vorschau"
+                    className="w-full h-48 object-cover rounded-lg border"
+                    style={{ aspectRatio: '16/9' }}
+                  />
+                  {isEditing && (
+                    <button
+                      onClick={removeBackgroundImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                      title="Bild entfernen"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  URL: {editForm.backgroundImage}
+                </p>
+              </div>
+            )}
+
             {isEditing ? (
-              <input
-                type="text"
-                value={editForm.backgroundImage || ""}
-                onChange={(e) => setEditForm({ ...editForm, backgroundImage: e.target.value })}
-                className="w-full border rounded px-3 py-2"
-              />
+              <div className="space-y-3">
+                {/* Upload Button */}
+                <div className="flex items-center space-x-3">
+                  <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                    {uploading ? 'Wird hochgeladen...' : 'Bild hochladen'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                  </label>
+                  <span className="text-sm text-gray-500">
+                    oder URL manuell eingeben
+                  </span>
+                </div>
+
+                {/* URL Input */}
+                <input
+                  type="url"
+                  value={editForm.backgroundImage || ""}
+                  onChange={(e) => setEditForm({ ...editForm, backgroundImage: e.target.value })}
+                  placeholder="https://example.com/header-image.jpg"
+                  className="w-full border rounded px-3 py-2"
+                  disabled={uploading}
+                />
+
+                {/* Upload Error */}
+                {uploadError && (
+                  <p className="text-red-600 text-sm">{uploadError}</p>
+                )}
+
+                {/* Upload Progress */}
+                {uploading && (
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-blue-600 h-2 rounded-full animate-pulse w-1/2"></div>
+                  </div>
+                )}
+
+                {/* Empfehlungen */}
+                <div className="bg-blue-50 p-3 rounded text-sm">
+                  <h4 className="font-medium text-blue-900 mb-1">Empfehlungen für Header-Bilder:</h4>
+                  <ul className="text-blue-800 space-y-1">
+                    <li>• <strong>Auflösung:</strong> 1920x1080px oder 1920x800px</li>
+                    <li>• <strong>Format:</strong> JPG oder WebP für beste Performance</li>
+                    <li>• <strong>Dateigröße:</strong> Unter 500KB für schnelle Ladezeiten</li>
+                    <li>• <strong>Motiv:</strong> Wichtige Elemente mittig positionieren</li>
+                  </ul>
+                </div>
+              </div>
             ) : (
-              <p className="text-gray-700">{header.backgroundImage || "Nicht gesetzt"}</p>
+              <div>
+                {header.backgroundImage ? (
+                  <div className="flex items-center space-x-3">
+                    <span className="text-green-600">✓ Hintergrundbild gesetzt</span>
+                    <a 
+                      href={header.backgroundImage} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline text-sm"
+                    >
+                      Bild anzeigen
+                    </a>
+                  </div>
+                ) : (
+                  <span className="text-gray-500">Kein Hintergrundbild gesetzt</span>
+                )}
+              </div>
             )}
           </div>
         </div>
       </div>
 
-            {/* Navigation */}
+      {/* Navigation */}
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Navigation</h3>
@@ -180,7 +332,7 @@ export function HeaderManagementTab({ router }: HeaderManagementTabProps) {
             <div className="w-48">URL</div>
             <div className="w-20 text-center">Status</div>
             <div className="w-20 text-center">Icon</div>
-            <div className="w-20 text-center">Typ</div>
+            <div className="w-20 text-center">Extern</div>
             <div className="w-24 text-center">Aktionen</div>
           </div>
         )}

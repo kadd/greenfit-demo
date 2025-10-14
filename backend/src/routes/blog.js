@@ -3,6 +3,8 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 
+const { backupData } = require("../utils/data");
+
 //get entire blog
 router.get('/', (req, res) => {
   const blogPath = path.join(__dirname, '../data/blog.json');
@@ -43,6 +45,8 @@ router.post('/create', (req, res) => {
 router.delete('/', (req, res) => {
   const blogPath = path.join(__dirname, '../data/blog.json');
   console.log(`Deleting entire blog in:`, blogPath);
+
+  // Setze den Blog-Inhalt auf einen leeren Zustand
   fs.writeFile(blogPath, JSON.stringify({ title: "Blog", items: [] }, null, 2), (writeErr) => {
     if (writeErr) {
       return res.status(500).json({ error: 'Blog konnte nicht gelöscht werden.' });
@@ -70,6 +74,13 @@ router.put('/', (req, res) => {
     console.log("Invalid blog data:", updatedBlog);
     return res.status(400).json({ error: 'Ungültige Blog-Daten.' });
   }
+
+  // Backup der aktuellen Daten vor dem Speichern
+  backupData().then((backupPath) => {
+    console.log("Backup erstellt unter:", backupPath);
+  }).catch((err) => {
+    console.error("Fehler beim Erstellen des Backups:", err);
+  });
 
   // ids für items hinzufügen, falls nicht vorhanden
   updatedBlog.items = updatedBlog.items.map((item, index) => ({
@@ -213,6 +224,15 @@ router.put('/items/:id', (req, res) => {
       }
       blog.items[postIndex] = { ...blog.items[postIndex], ...updatedPost };
       blog.updatedAt = new Date().toISOString();
+
+      // Backup der aktuellen Daten vor dem Speichern
+      backupData().then((backupPath) => {
+        console.log("Backup erstellt unter:", backupPath);
+      }).catch((err) => {
+        console.error("Fehler beim Erstellen des Backups:", err);
+      });
+
+      // Speichere die aktualisierten Blog-Daten
       fs.writeFile(blogPath, JSON.stringify(blog, null, 2), (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });

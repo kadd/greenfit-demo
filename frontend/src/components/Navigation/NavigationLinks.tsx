@@ -2,11 +2,14 @@ import React from "react";
 import Link from "next/link";
 import { useHeader } from "@/hooks/useHeader";
 import { getEmptyHeaderData } from "@/utils/mapHeaderData";
+import { renderIcon } from "@/utils/icons";
+
 
 type Props = {
   className?: string;
   onLinkClick?: () => void;
 };
+
 
 export default function NavigationLinks({ className = "", onLinkClick }: Props) {
   const { header } = useHeader(getEmptyHeaderData());
@@ -21,6 +24,7 @@ export default function NavigationLinks({ className = "", onLinkClick }: Props) 
           nav.href.startsWith("/#") ? (
             <Link key={key} href={nav.href} scroll={true} onClick={onLinkClick}>
               <span className={`px-3 py-2 rounded text-white hover:bg-green-800 transition font-semibold cursor-pointer whitespace-nowrap flex items-center ${className}`}>
+                {renderIcon(nav.icon)}
                 {nav.label}
               </span>
             </Link>
@@ -31,6 +35,7 @@ export default function NavigationLinks({ className = "", onLinkClick }: Props) 
               onClick={onLinkClick}
               className={`px-3 py-2 rounded text-white hover:bg-green-800 transition font-semibold whitespace-nowrap flex items-center ${className}`}
             >
+              {renderIcon(nav.icon)}
               {nav.label}
             </a>
           )

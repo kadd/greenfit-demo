@@ -48,5 +48,7 @@ next-env.d.ts
 #data
 /backend/src/data
 
+#backup
+/backend/src/backup
 # storage keys
 /backend/gcs-key.json

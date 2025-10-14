@@ -24,13 +24,14 @@ import TeamsTab from "./Tabs/TeamsTab";
 import ServicesTab from "./Tabs/ServicesTab";
 import FileUpload from "../ui/common/FileUpload";
 import { HeaderManagementTab } from "./Tabs/HeaderManagementTab";
+import { NavigationManagementTab } from "./Tabs/NavigationTab";
 
 
 type Props = {};
 
 export default function ContentPage() {
   const [content, setContent] = useState<ContentData>(getEmptyContentData());
-  const [activeTab, setActiveTab] = useState<"content" | "header" | "services" | "upload" | "contactrequests" | "blog" | "faq" | "terms" | "team" | "impressum" | "privacy">("content");
+  const [activeTab, setActiveTab] = useState<"content" | "header" | "services" | "upload" | "contactrequests" | "blog" | "navigation" | "faq" | "terms" | "team" | "impressum" | "privacy">("content");
   const [msg, setMsg] = useState("");
   const router = useRouter();
 
@@ -141,6 +142,12 @@ export default function ContentPage() {
               Header verwalten
             </button>
             <button
+              className={`py-2 px-4 font-semibold ${activeTab === "navigation" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
+              onClick={() => setActiveTab("navigation")}
+            >
+              Navigation verwalten
+            </button>
+            <button
               className={`py-2 px-4 font-semibold ${activeTab === "team" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500"}`}
               onClick={() => setActiveTab("team")}
             >
@@ -202,6 +209,9 @@ export default function ContentPage() {
         )}
         {activeTab === "header" && (
           <HeaderManagementTab router={router} />
+        )}
+        {activeTab === "navigation" && (
+          <NavigationManagementTab />
         )}
         {activeTab === "team" && (
           <TeamsTab router={router} />

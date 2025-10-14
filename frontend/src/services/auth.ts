@@ -1,6 +1,14 @@
-// services/authService.ts
+// services/auth.ts
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/auth' || "http://localhost:5001/api/auth";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/auth`;
+  }
+  return "http://localhost:5001/api/auth";
+};
+
+const API_URL = getApiUrl();
 
 export async function login(username: string, password: string) {
   const res = await fetch(`${API_URL}/login`, {

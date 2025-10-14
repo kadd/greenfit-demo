@@ -1,8 +1,15 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/header'|| "http://localhost:5000/api/header";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/header`;
+  }
+  return "http://localhost:5001/api/header";
+};
 
+const API_URL = getApiUrl();
 import { HeaderData } from "../types/header";
 
-export const fetchHeaderData = async () => {
+export const fetchHeaderDataService = async () => {
   try {
     const response = await fetch(`${API_URL}`);
     if (!response.ok) {
@@ -17,7 +24,7 @@ export const fetchHeaderData = async () => {
 };
 
 
-export const updateHeaderData = async (newHeader: HeaderData) => {
+export const updateHeaderDataService = async (newHeader: HeaderData) => {
   try {
     const response = await fetch(`${API_URL}`, {
       method: "PUT",
@@ -37,7 +44,7 @@ export const updateHeaderData = async (newHeader: HeaderData) => {
   }
 };
 
-export const deleteHeaderData = async () => {
+export const deleteHeaderDataSerice = async () => {
   try {
     const response = await fetch(`${API_URL}`, {
       method: "DELETE",
@@ -53,7 +60,7 @@ export const deleteHeaderData = async () => {
 };
 
 // Funktion zum Zurücksetzen der Header-Daten auf Standardwerte
-export const resetHeaderData = async () => {
+export const resetHeaderDataService = async () => {
   try {
     const response = await fetch(`${API_URL}/reset`, {
       method: "POST",
@@ -69,7 +76,7 @@ export const resetHeaderData = async () => {
   }
 };
 
-export function setGalleryInactiveIfEmpty() {
+export function setGalleryInactiveIfEmptyService() {
   return fetch(`${API_URL}/gallery/check`, {
     method: "POST",
   })
@@ -80,4 +87,48 @@ export function setGalleryInactiveIfEmpty() {
       return response.json();
     })
     .then((data) => data);
+}
+
+// frontend/src/services/header.ts - Erweiterte Debug-Version:
+// frontend/src/services/header.ts
+export function uploadHeaderImageService(file: File): Promise<{ url: string }> {
+  console.log("=== SERVICE DEBUG ===");
+  console.log("Input type:", typeof file);
+  console.log("Input constructor:", file.constructor.name);
+  console.log("Is File?", file instanceof File);
+  console.log("File details:", file);
+  
+  if (!(file instanceof File)) {
+    console.error("ERROR: Not a File object!");
+    throw new Error("Input is not a File object");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append('folder', 'header');
+  
+  console.log("FormData created successfully");
+  
+  // Debug FormData
+  for (let [key, value] of formData.entries()) {
+    console.log(`FormData[${key}]:`, typeof value, value);
+  }
+  
+  console.log("Making request to:", `${API_URL}/upload`);
+  console.log("====================");
+
+  return fetch(`${API_URL}/upload`, {
+    method: "POST",
+    body: formData,
+  }).then(async response => {
+    console.log("Response status:", response.status);
+    const responseText = await response.text();
+    console.log("Response text:", responseText);
+    
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status} - ${responseText}`);
+    }
+    
+    return JSON.parse(responseText);
+  });
 }

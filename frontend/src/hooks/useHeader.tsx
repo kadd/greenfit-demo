@@ -1,118 +1,107 @@
-import React, { use, useEffect } from "react";
-
+import React, { useState, useEffect, useCallback } from "react";
 import { HeaderData } from "../types/header";
 import { NavigationItem } from "../types/navigation";
+import { 
+  fetchHeaderDataService, 
+  updateHeaderDataService,
+  resetHeaderDataService, 
+  uploadHeaderImageService,
+  setGalleryInactiveIfEmptyService 
+} from "../services/header";
 
-import { fetchHeaderData, updateHeaderData,
-  resetHeaderData, setGalleryInactiveIfEmpty
- } from "../services/header";
-
-
-// Custom hook to manage header state
 export function useHeader(initialHeader: HeaderData) {
-  const [header, setHeader] = React.useState<HeaderData>(initialHeader);
+  // States im Hook - RICHTIG!
+  const [header, setHeader] = useState<HeaderData>(initialHeader);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    const fetchHeader = async () => {
-      try {
-        const data = await fetchHeaderData();
-        setHeader(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchHeader();
-    setGalleryStatus();
-  }, []);
-
-  const fetchHeader = async () => {
+  // Memoized fetch function
+  const fetchHeader = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const data = await fetchHeaderData();
+      const data = await fetchHeaderDataService();
       setHeader(data);
     } catch (error) {
+      setError(error instanceof Error ? error.message : "Fehler beim Laden");
       console.error(error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchHeader();
+    setGalleryStatus();
+  }, [fetchHeader]);
 
   const updateHeader = async (newHeader: HeaderData) => {
+    setLoading(true);
+    setError(null);
     try {
-      const updatedHeader = await updateHeaderData(newHeader);
+      const updatedHeader = await updateHeaderDataService(newHeader);
       setHeader(updatedHeader);
+      return updatedHeader;
     } catch (error) {
+      setError(error instanceof Error ? error.message : "Fehler beim Speichern");
       console.error(error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const resetHeader = () => {
     setHeader(initialHeader);
-  };  
+    setError(null);
+  };
 
   const setGalleryStatus = async () => {
     try {
-      const result = await setGalleryInactiveIfEmpty();
+      const result = await setGalleryInactiveIfEmptyService();
+      // Header neu laden nach Gallery-Status-Update
+      await fetchHeader();
       return result;
     } catch (error) {
+      setError(error instanceof Error ? error.message : "Fehler beim Gallery-Status");
       console.error(error);
     }
   };
 
-  return { header, updateHeader, resetHeader, setGalleryStatus };
-}
+  const uploadHeaderImage = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const data = await uploadHeaderImageService(file);
 
-// Helper function to find a navigation item by its ID
-export function findNavigationItemById(navigation: NavigationItem[], id: string): NavigationItem | undefined {
-  for (const item of navigation) {
-    if (item.id === id) {
-      return item;
-    }
-    if (item.children) {
-      const found = findNavigationItemById(item.children, id);
-      if (found) {
-        return found;
+      // Header mit neuer Bild-URL aktualisieren
+      if (data.url) {
+        const updatedHeader = { ...header, backgroundImage: data.url };
+        await updateHeader(updatedHeader);
       }
+      
+      return data;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Upload fehlgeschlagen");
+      console.error(error);
+      throw error;
+    } finally {
+      setUploading(false);
     }
-  }
-  return undefined;
-}
+  };
 
-// Helper function to update a navigation item by its ID
-export function updateNavigationItemById(navigation: NavigationItem[], id: string, updatedItem: Partial<NavigationItem>): NavigationItem[] {
-  return navigation.map(item => {
-    if (item.id === id) {
-      return { ...item, ...updatedItem };
-    }
-    if (item.children) {
-      return { ...item, children: updateNavigationItemById(item.children, id, updatedItem) };
-    }
-    return item;
-  });
-}
-
-// Helper function to add a new navigation item
-export function addNavigationItem(navigation: NavigationItem[], newItem: NavigationItem, parentId?: string): NavigationItem[] {
-  if (!parentId) {
-    return [...navigation, newItem];
-  }
-  return navigation.map(item => {
-    if (item.id === parentId) {
-      const children = item.children ? [...item.children, newItem] : [newItem];
-      return { ...item, children };
-    }
-    if (item.children) {
-      return { ...item, children: addNavigationItem(item.children, newItem, parentId) };
-    }
-    return item;
-  });
-}
-
-// Helper function to remove a navigation item by its ID
-export function removeNavigationItemById(navigation: NavigationItem[], id: string): NavigationItem[] {
-  return navigation
-    .filter(item => item.id !== id)
-    .map(item => {
-      if (item.children) {
-        return { ...item, children: removeNavigationItemById(item.children, id) };
-      }
-      return item;
-    });
+  // Alle States und Funktionen zurückgeben
+  return { 
+    header, 
+    loading, 
+    error, 
+    uploading,
+    updateHeader, 
+    resetHeader, 
+    setGalleryStatus, 
+    uploadHeaderImage,
+    refetch: fetchHeader // Für manuelles Neuladen
+  };
 }

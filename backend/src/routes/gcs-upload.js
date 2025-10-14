@@ -1,29 +1,17 @@
-const { Storage } = require("@google-cloud/storage");
+
 const multer = require("multer");
 const path = require("path");
 const express = require("express");
 const fs = require("fs");
 const router = express.Router();
 
-const { loadTeams, saveTeams } = require("../utils/teams");
+
+const {  bucket } = require("../services/storage");
 
 
 // Datei-Upload und -Verwaltung zu Google Cloud Storage (GCS)
 // https://cloud.google.com/storage/docs/reference/libraries#client-libraries-install-nodejs
 // https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-nodejs
-
-// GCS Schlüsseldatei (im .gitignore, nicht ins Repo!)
-if (!fs.existsSync(path.join(__dirname, "../../gcs-key.json"))) {
-  console.error("GCS Schlüsseldatei fehlt! Bitte gcs-key.json im backend-Ordner ablegen.");
-  process.exit(1);
-}
-
-// GCS initialisieren
-const storage = new Storage({
-  keyFilename: path.join(__dirname, "../../gcs-key.json"),
-  projectId: "greenfit-demo",
-});
-const bucket = storage.bucket("greenfit-demo-uploads");
 
 // Multer Speicher im RAM (für direkten Upload zu GCS)
 const upload = multer({ storage: multer.memoryStorage() });
@@ -107,86 +95,6 @@ router.get("/areas", (req, res) => {
   });
 });
 
-router.post("/upload-photo/:teamId/:memberid", upload.single("file"), async (req, res) => {
-  const memberId = req.params.memberid;
-  const teamId = req.params.teamId;
-  const teamData = loadTeams();
-  const team = teamData.find(t => t.id === teamId);
-  if (!team) return res.status(404).json({ error: "Team nicht gefunden." });
-  const member = team.members.find(m => m.id === memberId);
-
-  if (member && req.file) {
-    // Dateiname generieren
-    const gcsFileName = `team/${Date.now()}-${req.file.originalname}`;
-    const blob = bucket.file(gcsFileName);
-    const blobStream = blob.createWriteStream({
-      resumable: false,
-      contentType: req.file.mimetype,
-      //public: true,
-    });
-
-    blobStream.on("error", err => res.status(500).json({ error: err.message }));
-    blobStream.on("finish", async () => {
-      // Öffentliche URL generieren
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-      // Altes Foto ggf. löschen (optional, siehe GCS Doku)
-      member.photoSrc = publicUrl;
-      teamData.forEach(t => {
-        if (t.id === teamId) {
-          t.members = t.members.map(m => (m.id === memberId ? member : m));
-        }
-      });
-
-      //altes Foto löschen
-      
-      if (member.photoSrc) {
-        const oldFile = bucket.file(member.photoSrc);
-        oldFile.delete().catch(err => console.error("Fehler beim Löschen des alten Fotos:", err));
-      }
-     
-
-      // Team-Daten speichern
-      saveTeams(teamData);
-      res.json({ success: true, url: publicUrl });
-    });
-
-    blobStream.end(req.file.buffer);
-  } else {
-    res.status(400).json({ success: false, message: "Mitglied oder Datei fehlt." });
-  }
-});
-
-router.delete("/deletephoto/:teamId/:memberid", async (req, res) => {
-  const memberId = req.params.memberid;
-  const teamId = req.params.teamId;
-  const teamData = loadTeams();
-  const team = teamData.find(t => t.id === teamId);
-  if (!team) return res.status(404).json({ error: "Team nicht gefunden." });
-  const member = team.members.find(m => m.id === memberId);
-  if (member && member.photoSrc) {
-    // Foto aus GCS löschen
-    const filePath = member.photoSrc.split(`https://storage.googleapis.com/${bucket.name}/`)[1];
-    if (filePath) {
-      const file = bucket.file(filePath);
-      try {
-        await file.delete();
-      } catch (err) {
-        console.error("Fehler beim Löschen des Fotos aus GCS:", err);
-      }
-    }
-    // Foto-URL im Teammitglied zurücksetzen
-    member.photoSrc = "";
-    teamData.forEach(t => {
-      if (t.id === teamId) {
-        t.members = t.members.map(m => (m.id === memberId ? member : m));
-      }
-    });
-    saveTeams(teamData);
-    res.json({ success: true, message: "Foto gelöscht." });
-  } else {
-    res.status(400).json({ success: false, message: "Mitglied oder Foto fehlt." });
-  }
-});
 
 router.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) {

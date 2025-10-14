@@ -1,5 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/content' || "http://localhost:5001/api/content";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/content`;
+  }
+  return "http://localhost:5001/api/content";
+};
 
+const API_URL = getApiUrl();
 export async function getContentData(token?: string) {
   // ohne Token, wenn öffentlich zugänglich
   if (!token) {

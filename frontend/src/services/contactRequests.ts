@@ -1,6 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL + '/contactrequests'
-  : "http://localhost:5001/api/contactrequests";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/contactrequests`;
+  }
+  return "http://localhost:5001/api/contactrequests";
+};
+
+const API_URL = getApiUrl();
 
   import {ContactRequest, GroupedContactRequests, ContactRequestStatus } from "@/types/contactRequests";
 

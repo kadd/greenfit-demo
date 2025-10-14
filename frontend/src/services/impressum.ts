@@ -1,4 +1,13 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/impressum' || "http://localhost:3000/impressum";
+
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/impressum`;
+  }
+  return "http://localhost:5001/api/impressum";
+};
+
+const API_URL = getApiUrl();
 
 import { Impressum, ImpressumSection } from "@/types/impressum";
 

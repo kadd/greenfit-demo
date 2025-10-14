@@ -1,5 +1,13 @@
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL+'/upload' || "http://localhost:5001/api/upload";
+const getApiUrl = () => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) {
+    return `${base}/upload`;
+  }
+  return "http://localhost:5001/api/upload";
+};
+
+const API_URL = getApiUrl();
 
 // Daten für unauthentifizierte Nutzer abrufen
 export async function fetchPublicGallery() {

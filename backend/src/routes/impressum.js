@@ -3,6 +3,8 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 
+const { backupData } = require("../utils/data");
+
 
 // Impressum-Daten abrufen
 router.get('/', (req, res) => {
@@ -70,6 +72,14 @@ router.put('/', (req, res) => {
   // Füge ein Aktualisierungsdatum hinzu
   updatedImpressum.updatedAt = new Date().toISOString();  
   updatedImpressum.id = updatedImpressum.id || 'impressum';
+
+  // Backup der aktuellen Daten vor dem Speichern
+  backupData().then((backupPath) => {
+    console.log("Backup erstellt unter:", backupPath);
+  }).catch((err) => {
+    console.error("Fehler beim Erstellen des Backups:", err);
+  });
+
   fs.writeFile(impressumPath, JSON.stringify(updatedImpressum, null, 2), 'utf8', (err) => {
     if (err) {
       return res.status(500).json({ error: 'Impressum konnten nicht gespeichert werden.' });
@@ -271,6 +281,13 @@ router.post('/section', (req, res) => {
       // Aktualisiere das Impressum-Datum
       impressum.updatedAt = new Date().toISOString();
 
+      // Backup der aktuellen Daten vor dem Speichern
+      backupData().then((backupPath) => {
+        console.log("Backup erstellt unter:", backupPath);
+      }).catch((err) => {
+        console.error("Fehler beim Erstellen des Backups:", err);
+      });
+
       fs.writeFile(impressumPath, JSON.stringify(impressum, null, 2), 'utf8', (writeErr) => {
         if (writeErr) {
           return res.status(500).json({ error: 'Abschnitt konnten nicht hinzugefügt werden.' });
@@ -307,6 +324,13 @@ router.put('/section/:id', (req, res) => {
 
       // Aktualisiere das Impressum-Datum
       impressum.updatedAt = new Date().toISOString();
+
+      // Backup der aktuellen Daten vor dem Speichern
+      backupData().then((backupPath) => {
+        console.log("Backup erstellt unter:", backupPath);
+      }).catch((err) => {
+        console.error("Fehler beim Erstellen des Backups:", err);
+      });
 
       fs.writeFile(impressumPath, JSON.stringify(impressum, null, 2), 'utf8', (writeErr) => {
         if (writeErr) {
