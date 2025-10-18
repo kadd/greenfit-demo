@@ -20,7 +20,7 @@ import {
   bulkDeletePrivacySectionsService,
   bulkUpdatePrivacySectionsService,
   exportPrivacyDataService,
-  importPrivacyDataService,
+  importPrivacyDataFromFileService,
   validatePrivacyDataService,
   searchPrivacySectionsService,
   getPrivacyStatisticsService
@@ -58,7 +58,7 @@ export function usePrivacy() {
   }, [fetchPrivacyData]);
 
   // ==================== PRIVACY OPERATIONS ====================
-  const createNewPrivacy = async (privacyData?: Partial<Privacy>) => {
+  const createNewPrivacy = async (token: string) => {
     if (!token) {
       setError("Authentifizierung erforderlich");
       return null;
@@ -67,7 +67,7 @@ export function usePrivacy() {
     setSaving(true);
     setError(null);
     try {
-      const newPrivacy = await createPrivacyService(token, privacyData);
+      const newPrivacy = await createPrivacyService(token);
       setPrivacy(newPrivacy);
       setLastSaved(new Date());
       return newPrivacy;
@@ -128,7 +128,7 @@ export function usePrivacy() {
 const createNewPrivacySection = async (heading: string, text: string) => {
   if (!token) {
     setError("Authentifizierung erforderlich");
-    return null;
+    return null; 
   }
 
   setSaving(true);
@@ -260,7 +260,7 @@ const fetchSinglePrivacySectionById = async (sectionId: string) => {
       console.error('Reorder privacy sections error:', err);
       setError(err.message || "Fehler beim Neuordnen der Datenschutzabschnitte");
       // Bei Fehler: Ursprünglichen State wiederherstellen
-      setPrivacy(privacy);
+      await fetchPrivacyData();
       return null;
     } finally {
       setSaving(false);
@@ -341,7 +341,7 @@ const fetchSinglePrivacySectionById = async (sectionId: string) => {
   const exportPrivacy = async () => {
     setError(null);
     try {
-      const exportedData = await exportPrivacyDataService();
+      const exportedData = await exportPrivacyDataService(token || "");
       return exportedData;
     } catch (err: any) {
       console.error('Export privacy error:', err);
@@ -350,7 +350,7 @@ const fetchSinglePrivacySectionById = async (sectionId: string) => {
     }
   };
 
-  const importPrivacy = async (file: File) => {
+  const importPrivacy = async (file: File): Promise<Privacy | null> => {
     if (!token) {
       setError("Authentifizierung erforderlich");
       return null;
@@ -359,7 +359,7 @@ const fetchSinglePrivacySectionById = async (sectionId: string) => {
     setSaving(true);
     setError(null);
     try {
-      const importedPrivacy = await importPrivacyDataService(token, file);
+      const importedPrivacy = await importPrivacyDataFromFileService(token, file);
       setPrivacy(importedPrivacy);
       setLastSaved(new Date());
       return importedPrivacy;

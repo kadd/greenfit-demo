@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create empty privacy policy
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
   try {
     const { title = "Datenschutzerklärung", description = "Datenschutzbestimmungen" } = req.body;
     
@@ -66,10 +66,13 @@ router.put('/', async (req, res) => {
     }
     
     // Sections mit IDs versehen falls nicht vorhanden
+    
     privacy.sections = privacy.sections.map((section, index) => ({
       ...section,
       id: section.id || `section-${Date.now()}-${index}`,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      createdAt: section.createdAt || new Date().toISOString(),
+      importedAt: section.importedAt || new Date().toISOString(),
     }));
 
     const result = await fileOps.writeJsonFile(PRIVACY_FILE, privacy, {
@@ -118,12 +121,24 @@ router.delete('/', async (req, res) => {
 router.post('/reset', async (req, res) => {
   try {
     const defaultPrivacy = { 
-      title: "Datenschutzerklärung", 
-      isPage: true, 
-      description: "Datenschutzbestimmungen", 
-      sections: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      title: "Datenschutzerklärung",
+      isPage: true,
+      description: "Beschreibung der Datenschutzbestimmungen",
+      sections: [
+        {
+          id: "section-1",
+          heading: "Einleitung",
+          text: "Dies ist die Einleitung zur Datenschutzerklärung.",
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: "section-2",
+          heading: "Datenverarbeitung",
+          text: "Informationen zur Datenverarbeitung.",
+          createdAt: new Date().toISOString()
+        }
+      ],
+      createdAt: new Date().toISOString() 
     };
     
     const result = await fileOps.writeJsonFile(PRIVACY_FILE, defaultPrivacy, {
@@ -176,7 +191,7 @@ router.get('/sections/:id', async (req, res) => {
 // backend/src/routes/privacy.js - POST Route erweitern:
 
 // Create new section
-router.post('/sections', async (req, res) => {
+router.post('/section', async (req, res) => {
   try {
     console.log('=== CREATE SECTION DEBUG ===');
     console.log('Request body:', req.body);
@@ -320,8 +335,6 @@ router.delete('/sections/:id', async (req, res) => {
     }
   }
 });
-
-// ==================== BULK OPERATIONS ====================
 
 // Reorder sections
 router.put('/sections/reorder', async (req, res) => {

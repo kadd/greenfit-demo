@@ -1,0 +1,12 @@
+cd frontend
+
+# TypeScript Cache komplett löschen:
+rm -rf .next
+rm -rf node_modules/.cache
+rm -rf .tsbuildinfo
+
+# Node modules cache auch löschen:
+rm -rf node_modules/.cache
+
+# Dev Server neu starten:
+npm run dev

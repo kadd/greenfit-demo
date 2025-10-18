@@ -1,257 +1,318 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const fs = require('fs');
 
-const { backupData } = require("../utils/data");
+const fileOps = require('../services/fileOperations');
+
+const FAQ_FILE = '../data/faq.json';
+
+// backend/src/routes/faq.js - Debug-Middleware hinzufügen:
 
 
-//get entire FAQ
-router.get('/', (req, res) => {
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log("Loading FAQ from:", faqPath);
-  fs.readFile(faqPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'FAQ konnte nicht geladen werden.' });
-    }
-    try {
-      const faqs = JSON.parse(data);
-      res.json(faqs);
-    } catch (parseErr) {
-      res.status(500).json({ error: 'FAQ-Daten sind ungültig.' });
-    }
-  });
+
+// ✅ DEBUG: Request Body für alle FAQ Routes loggen
+router.use((req, res, next) => {
+  console.log('=== FAQ REQUEST DEBUG ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Content-Type:', req.headers['content-type']);
+  console.log('Authorization:', req.headers.authorization ? 'Present' : 'Missing');
+  console.log('Body Type:', typeof req.body);
+  console.log('Body Keys:', req.body ? Object.keys(req.body) : 'No body');
+  console.log('Raw Body Length:', req.body ? JSON.stringify(req.body).length : 0);
+  console.log('Raw Body:', JSON.stringify(req.body));
+  console.log('=== END FAQ DEBUG ===');
+  next();
+});
+
+// ✅ Error Handler für JSON-Parsing
+router.use((error, req, res, next) => {
+  if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+    console.error('=== FAQ JSON PARSING ERROR ===');
+    console.error('Error:', error.message);
+    console.error('URL:', req.url);
+    console.error('Method:', req.method);
+    console.error('Headers:', req.headers);
+    console.error('=== END FAQ JSON ERROR ===');
+    
+    return res.status(400).json({
+      error: 'Invalid JSON format in FAQ request',
+      details: error.message,
+      url: req.url,
+      method: req.method
+    });
+  }
+  next(error);
+});
+
+// Ihre bestehenden Routes...
+
+// Get entire FAQ
+router.get('/', async (req, res) => {
+  try {
+    const faq = await fileOps.readJsonFile(FAQ_FILE);
+    res.json(faq);
+  } catch (error) {
+    console.error('Error fetching faq:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Laden der FAQ',
+      details: error.message 
+    });
+  }
 });
 
 // create empty FAQ
-router.post('/create', (req, res) => {
-  const faqs = req.body;
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Saving FAQ to:`, faqPath);
+router.post('/create', async (req, res) => {
+  try {
+    const emptyFaq = { 
+      title: "FAQ", 
+      isPage: true, 
+      description: "Beschreibung der FAQ", 
+      items: [] 
+    };
 
-  // Optional: Validierung
-  if (!Array.isArray(faqs)) {
-    console.log("Invalid FAQ data:", faqs);
-    return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
-  }
-
-  // id zu items hinzufügen
-  if (Array.isArray(faqs)) {
-    faqs.forEach(item => {
-      item.id = item.id || Date.now().toString(); // einfache ID, wenn nicht vorhanden
-      item.createdAt = new Date().toISOString();
-      item.updatedAt = item.updatedAt || item.createdAt;
+    const result = await fileOps.writeJsonFile(FAQ_FILE, emptyFaq, { 
+      backup: true, 
+      validate: false // Kein Validieren, da leer
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Erstellen der FAQ',
+      details: error.message 
     });
   }
-
-  // Neues Impressum erstellen
-  faqs.createdAt = new Date().toISOString();
-  faqs.updatedAt = faqs.updatedAt || faqs.createdAt;
-
-  // Speichere die FAQ
-
-  fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'FAQ konnte nicht gespeichert werden.' });
-    }
-    res.status(200).json(faqs);
-  });
 });
 
-let isWriting = false;
-//update entire FAQ
-router.put('/', (req, res) => {
-  if (isWriting) {
-    return res.status(429).json({ error: 'Bitte warte, die FAQ wird gerade gespeichert.' });
-  }
-  isWriting = true;
-  const faq = req.body;
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Updating entire FAQ in:`, faqPath);
+// Update entire FAQ
+router.put('/', async (req, res) => {
+  try {
+    const faq = req.body;
 
-  // id zu items hinzufügen
-  if (Array.isArray(faq.items)) {
-    faq.items = faq.items.map(item => ({
-      id: item.id || Date.now().toString(), // einfache ID, wenn nicht vorhanden
-      question: item.question,
-      answer: item.answer,
+    if (!faq?.title || !Array.isArray(faq.items)) {
+      return res.status(400).json({ error: 'Title und Items sind erforderlich' });
+    }
+    
+    // Items mit IDs versehen
+    faq.items = faq.items.map((item, index) => ({
+      ...item,
+      id: item.id || `item-${index + 1}`,
+      updatedAt: item.updatedAt || new Date().toISOString(),
       createdAt: item.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString()
     }));
-  }
-
-  // Optional: Validierung
-  if (!Array.isArray(faq.items)) {
-    console.log("Invalid FAQ data:", faq);
-    return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
-  }
-
-  // Aktualisiere das FAQ-Datum
-  faq.updatedAt = new Date().toISOString();
-
-  // Backup der aktuellen Daten vor dem Speichern
-  backupData().then((backupPath) => {
-    console.log("Backup erstellt unter:", backupPath);
-  }).catch((err) => {
-    console.error("Fehler beim Erstellen des Backups:", err);
-  });
-
-  // Speichere die FAQ
-  fs.writeFile(faqPath, JSON.stringify(faq, null, 2), (writeErr) => {
-    isWriting = false;
-    if (writeErr) {
-      return res.status(500).json({ error: 'FAQ konnte nicht aktualisiert werden.' });
-    }
-    res.status(200).json(faq);
-  });
-});
-
-// Delete entire FAQ
-router.delete('/', (req, res) => {
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Deleting entire FAQ in:`, faqPath);
-  fs.writeFile(faqPath, JSON.stringify([], null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'FAQ konnte nicht gelöscht werden.' });
-    }
-    res.json({ message: 'FAQ wurde gelöscht.' });
-  });
-});
-
-// add new FAQ item
-router.post('/add', (req, res) => {
-  const newFaqItem = req.body;
-  if (!newFaqItem || !newFaqItem.question || !newFaqItem.answer) {
-    return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
-  }
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Adding new FAQ item to:`, faqPath);
-  fs.readFile(faqPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'FAQ konnte nicht geladen werden.' });
-    }
-    let faqs;
-    try {
-      faqs = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'FAQ-Daten sind ungültig.' });
-    }
-    newFaqItem.id = Date.now().toString(); // einfache ID
-    newFaqItem.createdAt = new Date().toISOString();
-    newFaqItem.updatedAt = new Date().toISOString();
-    faqs.push(newFaqItem);
 
     // Aktualisiere das FAQ-Datum
-    faqs.updatedAt = new Date().toISOString();
+    faq.updatedAt = new Date().toISOString();
 
-    fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'FAQ konnte nicht gespeichert werden.' });
-      }
-      res.status(201).json(newFaqItem);
+    const result = await fileOps.writeJsonFile(FAQ_FILE, faq, { backup: true });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Aktualisieren der FAQ',
+      details: error.message 
     });
-  });
+  }
 });
 
-//get single FAQ item by ID
-router.get('/items/:id', (req, res) => {
+
+
+// Delete entire FAQ
+router.delete('/', async (req, res) => {
+  try {
+    const emptyFaq = { title: "FAQ", isPage: true, description: "Beschreibung der FAQ", items: [] };
+    const result = await fileOps.writeJsonFile(FAQ_FILE, emptyFaq, { backup: true, validate: false });
+    res.status(200).json({ message: 'FAQ wurde gelöscht.', data: result });
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Löschen der FAQ',
+      details: error.message 
+    });
+  }
+});
+
+// reset FAQ to default
+router.post('/reset', async (req, res) => {
+  try {
+    const defaultFaq = { 
+      title: "FAQ", 
+      isPage: true, 
+      description: "Hier finden Sie Antworten auf häufig gestellte Fragen.",
+      importedAt: new Date().toISOString(),
+      effectiveDate: new Date().toISOString().split('T')[0], // nur Datumsteil
+      items: [
+        {
+          id: "item-1",
+          question: "Was ist dieses Projekt?",
+          answer: "Dieses Projekt ist eine Demo-Anwendung für FAQ-Verwaltung.",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: "item-2",
+          question: "Wie kann ich ein FAQ-Item hinzufügen?",
+          answer: "Sie können ein FAQ-Item über die API oder das Admin-Interface hinzufügen.",  
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ] 
+    };
+
+    const result = await fileOps.writeJsonFile(FAQ_FILE, defaultFaq, { backup: true, validate: true });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Zurücksetzen der FAQ',
+      details: error.message 
+    });
+  }
+});
+
+// =============================== INDIVIDUAL ITEMS MANAGEMENT =============================== //
+
+// get single FAQ item by ID
+router.get('/items/:id', async (req, res) => {
   const faqItemId = req.params.id;
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Loading FAQ item ${faqItemId} from:`, faqPath);
-  fs.readFile(faqPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'FAQ konnte nicht geladen werden.' });
+  try {
+    const faq = await fileOps.readJsonFile(FAQ_FILE);
+    const faqItem = faq.items.find(item => item.id === faqItemId);
+    if (!faqItem) {
+      return res.status(404).json({ error: 'FAQ-Item nicht gefunden.' });
     }
-    try {
-      const faqs = JSON.parse(data);
-      const faqItem = faqs.find(faq => faq.id === faqItemId);
-      if (!faqItem) {
-        return res.status(404).json({ error: 'FAQ-Item nicht gefunden.' });
-      }
-      res.json(faqItem);
-    } catch (parseErr) {
-      res.status(500).json({ error: 'FAQ-Daten sind ungültig.' });
+    res.json(faqItem);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Laden des FAQ-Items',
+      details: error.message 
+    });
+  }
+});
+
+// create new item
+router.post('/item', async (req, res) => {
+  try {
+    const newFaqItem = req.body;
+    if (!newFaqItem || !newFaqItem.question || !newFaqItem.answer) {
+      return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
     }
-  });
+    newFaqItem.id = `item-${Date.now()}`;
+    newFaqItem.createdAt = new Date().toISOString();
+    newFaqItem.updatedAt = new Date().toISOString();
+
+    const result = await fileOps.updateJsonFile(FAQ_FILE, (faq) => {
+      faq.items.push(newFaqItem);
+      // Aktualisiere das FAQ-Datum
+      faq.updatedAt = new Date().toISOString();
+      return faq;
+    }, { backup: true });
+
+    res.status(201).json(newFaqItem);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Erstellen des FAQ-Items',
+      details: error.message 
+    });
+  }
 });
 
 //update single FAQ item by ID
-router.put('/items/:id', (req, res) => {
+router.put('/items/:id', async (req, res) => {
   const faqItemId = req.params.id;
-  const updatedFaq = req.body;
-  if (!updatedFaq || !updatedFaq.question || !updatedFaq.answer) {
+  const updatedData = req.body;
+
+  if (!updatedData || !updatedData.question || !updatedData.answer) {
     return res.status(400).json({ error: 'Ungültige FAQ-Daten.' });
   }
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Updating FAQ item ${faqItemId} in:`, faqPath);
-  fs.readFile(faqPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'FAQ konnte nicht geladen werden.' });
-    }
-    let faqs;
-    try {
-      faqs = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'FAQ-Daten sind ungültig.' });
-    }
-    const faqIndex = faqs.findIndex(faq => faq.id === faqItemId);
-    if (faqIndex === -1) {
-      return res.status(404).json({ error: 'FAQ-Item nicht gefunden.' });
-    }
-    updatedFaq.id = faqItemId; // ID beibehalten
-    faqs[faqIndex] = updatedFaq;
-    updatedFaq.updatedAt = new Date().toISOString();
 
-    // Aktualisiere das FAQ-Datum
-    faqs.updatedAt = new Date().toISOString();
-
-    // Backup der aktuellen Daten vor dem Speichern
-    backupData().then((backupPath) => {
-      console.log("Backup erstellt unter:", backupPath);
-    }).catch((err) => {
-      console.error("Fehler beim Erstellen des Backups:", err);
-    });
-
-    fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'FAQ konnte nicht aktualisiert werden.' });
+  try {
+    const result = await fileOps.updateJsonFile(FAQ_FILE, (faq) => {
+      const itemIndex = faq.items.findIndex(item => item.id === faqItemId);
+      if (itemIndex === -1) {
+        throw new Error('FAQ-Item nicht gefunden.');
       }
-      res.status(200).json(updatedFaq);
+      faq.items[itemIndex] = {
+        ...faq.items[itemIndex],
+        ...updatedData,
+        updatedAt: new Date().toISOString()
+      };
+      // Aktualisiere das FAQ-Datum
+      faq.updatedAt = new Date().toISOString();
+      return faq;
+    }, { backup: true });
+
+    res.json(result);
+  } catch (error) {
+    if (error.message === 'FAQ-Item nicht gefunden.') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ 
+      message: 'Fehler beim Aktualisieren des FAQ-Items',
+      details: error.message 
     });
-  });
+  }
 });
 
 //delete single FAQ item by ID
-router.delete('/:id', (req, res) => {
+router.delete('/items/:id', async (req, res) => {
   const faqItemId = req.params.id;
-  const faqPath = path.join(__dirname, '../data/faq.json');
-  console.log(`Deleting FAQ item ${faqItemId} in:`, faqPath);
-  fs.readFile(faqPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'FAQ konnte nicht geladen werden.' });
-    }
-    let faqs; 
-    try {
-      faqs = JSON.parse(data);
-    } catch (parseErr) {
-      return res.status(500).json({ error: 'FAQ-Daten sind ungültig.' });
-    }
-    const faqIndex = faqs.findIndex(faq => faq.id === faqItemId);
-    if (faqIndex === -1) {
-      return res.status(404).json({ error: 'FAQ-Item nicht gefunden.' });
-    }
-    faqs.splice(faqIndex, 1);   
-
-    // Aktualisiere das FAQ-Datum
-    faqs.updatedAt = new Date().toISOString();
-    
-    fs.writeFile(faqPath, JSON.stringify(faqs, null, 2), (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'FAQ konnte nicht gelöscht werden.' });
+  try {
+    const result = await fileOps.updateJsonFile(FAQ_FILE, (faq) => {
+      const itemIndex = faq.items.findIndex(item => item.id === faqItemId);
+      if (itemIndex === -1) {
+        throw new Error('FAQ-Item nicht gefunden.');
       }
-      res.json({ message: 'FAQ-Item wurde gelöscht.' });
+      faq.items.splice(itemIndex, 1);
+      // Aktualisiere das FAQ-Datum
+      faq.updatedAt = new Date().toISOString();
+      return faq;
+    }, { backup: true });
+
+    res.json({ message: 'FAQ-Item wurde gelöscht.', data: result });
+  } catch (error) {
+    if (error.message === 'FAQ-Item nicht gefunden.') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ 
+      message: 'Fehler beim Löschen des FAQ-Items',
+      details: error.message 
     });
-  });
+  }
+});
+
+// reorder FAQ items
+router.post('/items/reorder', async (req, res) => {
+  const { newOrder } = req.body; // Erwartet ein Array von FAQ-Item-IDs in der neuen Reihenfolge
+  if (!Array.isArray(newOrder)) {
+    return res.status(400).json({ error: 'Ungültige Daten. Ein Array von FAQ-Item-IDs wird erwartet.' });
+  }
+
+  try {
+    const result = await fileOps.updateJsonFile(FAQ_FILE, (faq) => {
+      const reorderedItems = [];
+      newOrder.forEach(id => {
+        const item = faq.items.find(i => i.id === id);
+        if (item) {
+          reorderedItems.push(item);
+        }
+      });
+      if (reorderedItems.length !== faq.items.length) {
+        throw new Error('Die neue Reihenfolge enthält ungültige oder unvollständige FAQ-Item-IDs.');
+      }
+      faq.items = reorderedItems;
+      // Aktualisiere das FAQ-Datum
+      faq.updatedAt = new Date().toISOString();
+      return faq;
+    }, { backup: true });
+
+    res.json(result);
+  } catch (error) {
+    if (error.message.includes('ungültige oder unvollständige FAQ-Item-IDs')) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ 
+      message: 'Fehler beim Neuordnen der FAQ-Items',
+      details: error.message 
+    });
+  }
 });
 
 module.exports = router;

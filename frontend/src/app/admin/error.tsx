@@ -13,6 +13,8 @@ export default function AdminError({
         <h2 className="text-xl font-bold text-red-600 mb-4">Admin-Fehler</h2>
         <p className="text-gray-600 mb-4">
           Ein Fehler ist im Admin-Bereich aufgetreten.
+          <br />
+          {error.message}
         </p>
         <div className="space-y-2">
           <button

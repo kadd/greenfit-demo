@@ -1,5 +1,6 @@
 // types/privacy.ts - Erweiterte Types:
 export interface Privacy {
+  id?: string;
   title: string;
   isPage: boolean;
   description?: string;
@@ -7,6 +8,7 @@ export interface Privacy {
   createdAt?: string;
   updatedAt?: string;
   importedAt?: string;
+  effectiveDate: string; // ISO Datum
 }
 
 export interface PrivacySection {

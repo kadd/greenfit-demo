@@ -6,7 +6,7 @@
  * and their sections. It also includes advanced features such as
  * bulk operations, import/export, validation, search, and statistics.
  ****************************************************************/
-import { Privacy, PrivacySection } from "../types/privacy";
+import { Privacy, PrivacySection, PrivacyStatistics } from "../types/privacy";
 
 const getApiUrl = () => {
   const base = process.env.NEXT_PUBLIC_API_URL;
@@ -33,7 +33,7 @@ export async function fetchPrivacyService() {
 
 export async function createPrivacyService(token: string) {
   try {
-    const response = await fetch(`${API_URL}/privacy`, {
+    const response = await fetch(`${API_URL}/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export async function deletePrivacyService(token: string) {
 // ✅ NEUE VERSION (echte API-Call Funktion):
 export async function createPrivacySectionService(token: string, sectionData: { heading: string; text: string }) {
   try {
-    const response = await fetch(`${API_URL}/sections`, {
+    const response = await fetch(`${API_URL}/section`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -252,21 +252,19 @@ export async function reorderPrivacySectionsService(token: string, sectionIds: s
 // ✅ Bulk Operations
 export async function bulkDeletePrivacySectionsService(token: string, sectionIds: string[]) {
   try {
-    const deletePromises = sectionIds.map(id => deletePrivacySectionByIdService(token, id));
-    const results = await Promise.allSettled(deletePromises);
-    
-    const successful = results.filter(r => r.status === 'fulfilled').length;
-    const failed = results.filter(r => r.status === 'rejected').length;
-    
-    return {
-      successful,
-      failed,
-      total: sectionIds.length,
-      results
-    };
-  } catch (error) {
-    console.error('Bulk delete privacy sections error:', error);
-    throw new Error("Fehler beim Löschen mehrerer Datenschutzabschnitte");
+
+    const res = await fetch(`${API_URL}/sections/bulk-delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ sectionIds }),
+    });
+    if (!res.ok) throw new Error("Fehler beim Löschen der Datenschutzabschnitte");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Löschen der Datenschutzabschnitte");
   }
 }
 
@@ -276,69 +274,51 @@ export async function bulkUpdatePrivacySectionsService(
   updates: Array<{ id: string; data: Partial<PrivacySection> }>
 ) {
   try {
-    const updatePromises = updates.map(({ id, data }) => 
-      updatePrivacySectionByIdService(token, id, data)
-    );
-    
-    const results = await Promise.allSettled(updatePromises);
-    
-    const successful = results.filter(r => r.status === 'fulfilled').length;
-    const failed = results.filter(r => r.status === 'rejected').length;
-    
-    return {
-      successful,
-      failed,
-      total: updates.length,
-      results
-    };
-  } catch (error) {
-    console.error('Bulk update privacy sections error:', error);
-    throw new Error("Fehler beim Aktualisieren mehrerer Datenschutzabschnitte");
+    const res = await fetch(`${API_URL}/sections/bulk-update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ updates }),
+    });
+    if (!res.ok) throw new Error("Fehler beim Aktualisieren der Datenschutzabschnitte");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Aktualisieren der Datenschutzabschnitte");
   }
 }
 
 // ✅ Privacy Export
-export async function exportPrivacyDataService() {
+export async function exportPrivacyDataService(token: string) {
   try {
-    const privacy = await fetchPrivacyService();
-    
-    const exportData = {
-      ...privacy,
-      exportedAt: new Date().toISOString(),
-      version: "1.0"
-    };
-    
-    // Download als JSON
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-      type: 'application/json' 
+    const res = await fetch(`${API_URL}/export`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `privacy-export-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    return exportData;
-  } catch (error) {
-    console.error('Privacy export error:', error);
+    if (!res.ok) throw new Error("Fehler beim Exportieren der Datenschutzbestimmungen");
+    return res.json();
+  } catch (err) {
     throw new Error("Fehler beim Exportieren der Datenschutzbestimmungen");
-  }
+  } 
 }
 
-// ✅ Privacy Import
-export async function importPrivacyDataService(token: string, file: File): Promise<Privacy> {
+// ✅ Privacy Import aus Datei
+// Format: JSON
+export async function importPrivacyDataFromFileService(token: string, file: File): Promise<Privacy> {
   try {
     const text = await file.text();
     const importedData = JSON.parse(text);
-    
+
     // Validierung der importierten Daten
-    if (!importedData.title || !Array.isArray(importedData.sections)) {
+    if (!importedData ||  !Array.isArray(importedData.sections)) {
       throw new Error("Ungültiges Datenschutz-Dateiformat");
     }
+
+    if(!importedData.title)
+      importedData.title = "Importierte Datenschutzerklärung";
     
     // Sections mit neuen IDs versehen (Konflikt-Vermeidung)
     const processedData = {
@@ -364,11 +344,11 @@ export async function importPrivacyDataService(token: string, file: File): Promi
 // ✅ Privacy Validation
 export function validatePrivacyDataService(privacy: Partial<Privacy>): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   if (!privacy.title?.trim()) {
     errors.push("Titel ist erforderlich");
   }
-  
+
   if (!Array.isArray(privacy.sections)) {
     errors.push("Sections müssen ein Array sein");
   } else {
@@ -406,10 +386,10 @@ export function searchPrivacySectionsService(privacy: Privacy, searchTerm: strin
 }
 
 // ✅ Privacy Statistics
-export function getPrivacyStatisticsService(privacy: Privacy) {
-  const sections = privacy.sections;
+export function getPrivacyStatisticsService(privacy: Privacy) : Promise<PrivacyStatistics> {
+  const sections = privacy?.sections || [];
   
-  return {
+  return Promise.resolve({
     totalSections: sections.length,
     totalWords: sections.reduce((acc, section) => 
       acc + section.heading.split(' ').length + section.text.split(' ').length, 0
@@ -424,5 +404,5 @@ export function getPrivacyStatisticsService(privacy: Privacy) {
       : 0,
     lastUpdated: privacy.updatedAt || null,
     isEmpty: sections.length === 0
-  };
+  });
 }
