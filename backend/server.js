@@ -2,10 +2,27 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const authMiddleware = require("./middleware/authMiddleware");
+const DefaultGenerator = require("./src/services/defaultGenerator");
 const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+async function initializeDefaults() {
+  const dataDir = path.join(__dirname, 'data');
+   try {
+    await DefaultGenerator.generateAllDefaults(dataDir); // pass { force: true } to overwrite
+    console.log('✅ Default content generated successfully.');
+  } catch (error) {
+    console.error('❌ Error generating default content:', error);
+    throw error;
+  }
+}
+
+async function startServer() {
+  await initializeDefaults();
+  app.listen(5001, '0.0.0.0', () => console.log("Server läuft auf Port 5001"));
+}
 
 app.use(cors());
 
@@ -75,4 +92,5 @@ app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({ success: true, message: "Du hast Zugriff auf geschützte Daten 🚀", user: req.user });
 });
 
-app.listen(5001, '0.0.0.0', () => console.log("Server läuft auf Port 5001"));
+startServer();
+// --- IGNORE ---

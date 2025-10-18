@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const fileOps = require('../services/fileOperations');
+const DefaultGenerator = require('../services/defaultGenerator');
 
 const PRIVACY_FILE = '../data/privacy.json';
 
@@ -120,26 +121,7 @@ router.delete('/', async (req, res) => {
 // reset privacy to default
 router.post('/reset', async (req, res) => {
   try {
-    const defaultPrivacy = { 
-      title: "Datenschutzerklärung",
-      isPage: true,
-      description: "Beschreibung der Datenschutzbestimmungen",
-      sections: [
-        {
-          id: "section-1",
-          heading: "Einleitung",
-          text: "Dies ist die Einleitung zur Datenschutzerklärung.",
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: "section-2",
-          heading: "Datenverarbeitung",
-          text: "Informationen zur Datenverarbeitung.",
-          createdAt: new Date().toISOString()
-        }
-      ],
-      createdAt: new Date().toISOString() 
-    };
+    const defaultPrivacy = DefaultGenerator.generateDefaultPrivacy();
     
     const result = await fileOps.writeJsonFile(PRIVACY_FILE, defaultPrivacy, {
       backup: true,

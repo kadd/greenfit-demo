@@ -1,0 +1,74 @@
+{
+  "id": "blog",
+  "title": "Blog",
+  "isPage": true,
+  "description": "Beschreibung des Blogs",
+  "createdAt": "2025-10-18T14:54:33.163Z",
+  "updatedAt": "2025-10-18T14:54:33.163Z",
+  "items": [
+    {
+      "id": "post-1",
+      "title": "Willkommen in unserem Blog",
+      "excerpt": "Dies ist unser erster Blog Post.",
+      "content": "Vollständiger Inhalt des ersten Posts...",
+      "author": "GreenFit Team",
+      "date": "2025-10-18",
+      "tags": [
+        "Willkommen",
+        "News"
+      ],
+      "published": true,
+      "featuredImage": null,
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "post-2",
+      "title": "Fitness Tipps für Einsteiger",
+      "excerpt": "Grundlegende Tipps für Einsteiger.",
+      "content": "Vollständiger Inhalt des zweiten Posts...",
+      "author": "GreenFit Team",
+      "date": "2025-10-18",
+      "tags": [
+        "Fitness",
+        "Tipps"
+      ],
+      "published": true,
+      "featuredImage": null,
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "post-3",
+      "title": "Ernährungsrichtlinien für Sportler",
+      "excerpt": "Wichtige Ernährungstipps für Sportler.",
+      "content": "Vollständiger Inhalt des dritten Posts...",
+      "author": "GreenFit Team",
+      "date": "2025-10-18",
+      "tags": [
+        "Ernährung",
+        "Sport"
+      ],
+      "published": true,
+      "featuredImage": null,
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "post-4",
+      "title": "Die besten Workout-Routinen",
+      "excerpt": "Effektive Workout-Routinen für jedes Fitnesslevel.",
+      "content": "Vollständiger Inhalt des vierten Posts...",
+      "author": "GreenFit Team",
+      "date": "2025-10-18",
+      "tags": [
+        "Workout",
+        "Fitness"
+      ],
+      "published": true,
+      "featuredImage": null,
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    }
+  ]
+}

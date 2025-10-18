@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const fileOps = require('../services/fileOperations');
+const DefaultGenerator = require('../services/defaultGenerator');
 
 const TERMS_FILE = '../data/terms.json';
 
@@ -84,11 +85,11 @@ router.delete('/', async (req, res) => {
       sections: [] 
     };
 
-    await fileOps.writeJsonFile(TERMS_FILE, emptyTerms, { 
+    const result = await fileOps.writeJsonFile(TERMS_FILE, emptyTerms, { 
       backup: true, validate: false // Kein Validieren, da leer
     });
 
-    res.json({ message: 'AGB wurden gelöscht' });
+    res.json({ message: 'AGB wurden gelöscht.', details: result });
   } catch (error) {
     res.status(500).json({ 
       error: 'Fehler beim Löschen der AGB',
@@ -100,43 +101,7 @@ router.delete('/', async (req, res) => {
 // reset AGB to default template
 router.post('/reset', async (req, res) => {
   try {
-    const defaultTerms = {
-      title: "AGB",
-      isPage: true,
-      description: "Beschreibung der AGB",
-      sections: [
-        {
-          id: "section-1",
-          heading: "Allgemeine Geschäftsbedingungen",
-          text: "Willkommen zu unseren Allgemeinen Geschäftsbedingungen (AGB). Diese Bedingungen regeln Ihre Nutzung unserer Dienstleistungen und Produkte. Bitte lesen Sie sie sorgfältig durch."
-        },
-        {
-          id: "section-2",
-          heading: "Vertragsabschluss",
-          text: "Der Vertrag kommt zustande, wenn Sie unsere Dienstleistungen in Anspruch nehmen oder unsere Produkte erwerben. Mit der Nutzung unserer Angebote erklären Sie sich mit diesen AGB einverstanden."
-        },
-        {
-          id: "section-3",
-          heading: "Zahlungsbedingungen",
-          text: "Die Zahlung für unsere Dienstleistungen und Produkte ist gemäß den auf unserer Website angegebenen Bedingungen zu leisten. Wir akzeptieren verschiedene Zahlungsmethoden, die auf unserer Zahlungsseite aufgeführt sind."
-        },
-        {
-          id: "section-4",
-          heading: "Haftungsausschluss",
-          text: "Wir übernehmen keine Haftung für Schäden, die durch die Nutzung unserer Dienstleistungen oder Produkte entstehen, es sei denn, diese beruhen auf grober Fahrlässigkeit oder Vorsatz unsererseits."
-        },
-        {
-          id: "section-5",
-          heading: "Änderungen der AGB",
-          text: "Wir behalten uns das Recht vor, diese AGB jederzeit zu ändern. Änderungen werden auf unserer Website veröffentlicht und treten mit ihrer Veröffentlichung in Kraft."
-        },
-        {
-          id: "section-6",
-          heading: "Geltendes Recht",
-          text: "Diese AGB unterliegen dem Recht des Landes, in dem unser Unternehmen seinen Sitz hat. Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesen AGB ist unser  Firmensitz."
-        }
-      ]
-    };
+    const defaultTerms = DefaultGenerator.generateDefaultTerms();
 
     const result = await fileOps.writeJsonFile(TERMS_FILE, defaultTerms, {
       backup: true,

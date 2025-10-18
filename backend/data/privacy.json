@@ -1,0 +1,45 @@
+{
+  "id": "privacy",
+  "title": "Datenschutzerklärung",
+  "isPage": true,
+  "description": "Informationen zum Datenschutz",
+  "createdAt": "2025-10-18T14:54:33.163Z",
+  "updatedAt": "2025-10-18T14:54:33.163Z",
+  "sections": [
+    {
+      "id": "section-1",
+      "heading": "1. Allgemeine Informationen",
+      "text": "Diese Datenschutzerklärung informiert über die Verarbeitung personenbezogener Daten.",
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "section-2",
+      "heading": "2. Rechte der betroffenen Personen",
+      "text": "Sie haben das Recht, Auskunft über die Verarbeitung Ihrer Daten zu erhalten.",
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "section-3",
+      "heading": "3. Datenverarbeitung im Auftrag",
+      "text": "Wir verarbeiten Ihre Daten nur im Rahmen der gesetzlichen Vorgaben.",
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "section-4",
+      "heading": "4. Datensicherheit",
+      "text": "Wir setzen technische und organisatorische Maßnahmen ein, um Ihre Daten zu schützen.",
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    },
+    {
+      "id": "section-5",
+      "heading": "5. Änderungen der Datenschutzerklärung",
+      "text": "Wir behalten uns vor, diese Datenschutzerklärung anzupassen.",
+      "createdAt": "2025-10-18T14:54:33.163Z",
+      "updatedAt": "2025-10-18T14:54:33.163Z"
+    }
+  ]
+}

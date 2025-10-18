@@ -6,7 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    
+    "create-defaults": "node src/scripts/createDefaults.js",
+    "reset-data": "node src/scripts/resetData.js",
+    "reset-blog": "node src/scripts/resetData.js blog",
+    "reset-faq": "node src/scripts/resetData.js faq",
+    "reset-privacy": "node src/scripts/resetData.js privacy", 
+    "reset-terms": "node src/scripts/resetData.js terms",
+    "backup-data": "node src/scripts/backupData.js",
+    "restore-data": "node src/scripts/restoreData.js"
   },
   "keywords": [],
   "author": "",

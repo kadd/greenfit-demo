@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 
 const fileOps = require('../services/fileOperations');
+const DefaultGenerator = require('../services/defaultGenerator');
 
 const FAQ_FILE = '../data/faq.json';
 
@@ -133,29 +134,7 @@ router.delete('/', async (req, res) => {
 // reset FAQ to default
 router.post('/reset', async (req, res) => {
   try {
-    const defaultFaq = { 
-      title: "FAQ", 
-      isPage: true, 
-      description: "Hier finden Sie Antworten auf häufig gestellte Fragen.",
-      importedAt: new Date().toISOString(),
-      effectiveDate: new Date().toISOString().split('T')[0], // nur Datumsteil
-      items: [
-        {
-          id: "item-1",
-          question: "Was ist dieses Projekt?",
-          answer: "Dieses Projekt ist eine Demo-Anwendung für FAQ-Verwaltung.",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: "item-2",
-          question: "Wie kann ich ein FAQ-Item hinzufügen?",
-          answer: "Sie können ein FAQ-Item über die API oder das Admin-Interface hinzufügen.",  
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ] 
-    };
+    const defaultFaq = DefaultGenerator.generateDefaultFaq();
 
     const result = await fileOps.writeJsonFile(FAQ_FILE, defaultFaq, { backup: true, validate: true });
     res.status(200).json(result);

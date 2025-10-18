@@ -3,107 +3,120 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 
-const { backupData } = require("../utils/data");
+const fileOps = require('../services/fileOperations');
+const DefaultGenerator = require('../services/defaultGenerator');
+
+const BLOG_FILE = '../data/blog.json';
 
 //get entire blog
-router.get('/', (req, res) => {
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log("Loading Blog from:", blogPath);
-  fs.readFile(blogPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
-    }
-    try {
-      const blog = JSON.parse(data);
-      res.json(blog);
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Blog-Daten sind ungültig.' });
-    }
-  });
+router.get('/', async (req, res) => {
+ try {
+    const blog = await fileOps.readJsonFile(BLOG_FILE);
+    res.json(blog);
+ } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Abrufen des Blogs',
+      details: error.message 
+    });
+ }
 });
 
 // create empty blog
-router.post('/create', (req, res) => {
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log(`Creating empty blog in:`, blogPath);
-  const emptyBlog = { title: "Blog", items: [] };
+router.post('/create', async (req, res) => {
+  try {
+    const emptyBlog = { 
+      title: "Blog", 
+      description: "Beschreibung des Blogs", 
+      items: [] 
+    };
 
-  // Füge eine ID und ein Erstellungsdatum hinzu
-  emptyBlog.id = "blog-" + Date.now();
-  emptyBlog.createdAt = new Date().toISOString();
-  emptyBlog.updatedAt = emptyBlog.createdAt;
-
-  fs.writeFile(blogPath, JSON.stringify(emptyBlog, null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'Blog konnte nicht erstellt werden.' });
-    }
-    res.status(201).json(emptyBlog);
-  });
+    const result = await fileOps.writeJsonFile(BLOG_FILE, emptyBlog, { 
+      backup: true, 
+      validate: false // Kein Validieren, da leer
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Erstellen des Blogs',
+      details: error.message 
+    });
+  }
 });
 
 // Delete entire blog
-router.delete('/', (req, res) => {
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log(`Deleting entire blog in:`, blogPath);
-
-  // Setze den Blog-Inhalt auf einen leeren Zustand
-  fs.writeFile(blogPath, JSON.stringify({ title: "Blog", items: [] }, null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'Blog konnte nicht gelöscht werden.' });
-    }
-    res.json({ message: 'Blog wurde gelöscht.' });
-  });
+router.delete('/', async (req, res) => {
+  try {
+    const emptyBlog = { 
+      title: "Blog", 
+      description: "Beschreibung des Blogs", 
+      items: [] 
+    };
+    const result = await fileOps.writeJsonFile(BLOG_FILE, emptyBlog, { 
+      backup: true, 
+      validate: false // Kein Validieren, da leer
+    });
+    res.json({ message: 'Blog wurde gelöscht.', details: result });
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Löschen des Blogs',
+      details: error.message 
+    });
+  }
+  
 });
 
-// Prevent concurrent writes
-let isWriting = false;
 
 // Update entire blog
-router.put('/', (req, res) => {
-  if (isWriting) {
-    return res.status(429).json({ error: 'Bitte warte, der Blog wird gerade gespeichert.' });
-  }
-  isWriting = true;
-  const blog = req.body;
-    const updatedBlog = blog;
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log(`Updating entire blog in:`, blogPath);
+router.put('/', async (req, res) => {
+  try {
+    const blog = req.body;
 
-  // Optional: Validierung
-  if (!updatedBlog || !updatedBlog.title || !updatedBlog.items) {
-    console.log("Invalid blog data:", updatedBlog);
-    return res.status(400).json({ error: 'Ungültige Blog-Daten.' });
-  }
-
-  // Backup der aktuellen Daten vor dem Speichern
-  backupData().then((backupPath) => {
-    console.log("Backup erstellt unter:", backupPath);
-  }).catch((err) => {
-    console.error("Fehler beim Erstellen des Backups:", err);
-  });
-
-  // ids für items hinzufügen, falls nicht vorhanden
-  updatedBlog.items = updatedBlog.items.map((item, index) => ({
-    id: item.id || (index + 1).toString(),
-    ...item
-  }));
-
-  // Zeit messen
-  const startTime = Date.now();
-  console.log(`Start writing blog at ${new Date(startTime).toISOString()}`);
-
-  // Aktualisiere das Blog-Datum
-  updatedBlog.updatedAt = new Date().toISOString();
-
-  fs.writeFile(blogPath, JSON.stringify(updatedBlog, null, 2), (writeErr) => {
-    if (writeErr) {
-      return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });
+    if (!blog?.title || !Array.isArray(blog.items)) {
+      return res.status(400).json({ error: 'Title und Items sind erforderlich' });
     }
-    isWriting = false;
-    res.json(updatedBlog);
-  });
-  const endTime = Date.now();
-  console.log(`Finished writing blog at ${new Date(endTime).toISOString()}, took ${endTime - startTime}ms`);
+    
+    // Items mit IDs versehen
+    blog.items = blog.items.map((item, index) => ({
+      ...item,
+      id: item.id || `item-${index + 1}`,
+      updatedAt: item.updatedAt || new Date().toISOString(),
+      createdAt: item.createdAt || new Date().toISOString(),
+    }));
+
+    // Aktualisiere das Blog-Datum
+    blog.updatedAt = new Date().toISOString();
+
+    const result = await fileOps.writeJsonFile(BLOG_FILE, blog, {
+      backup: true,
+      validate: true
+    });
+    
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Aktualisieren des Blogs',
+      details: error.message 
+    });
+  }
+});
+
+// reset blog to default template
+router.post('/reset', async (req, res) => {
+  try {
+    const defaultBlog = DefaultGenerator.generateDefaultBlog();
+
+    const result = await fileOps.writeJsonFile(BLOG_FILE, defaultBlog, {
+      backup: true,
+      validate: true
+    });
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Fehler beim Zurücksetzen des Blogs',
+      details: error.message
+    });
+  }
 });
 
 // Add new blog post
