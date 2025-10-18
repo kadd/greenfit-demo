@@ -17,7 +17,7 @@ frontend/node_modules
 
 # next.js
 frontend/.next/
-/out/
+frontend/out/
 
 # production
 /build
@@ -47,8 +47,63 @@ next-env.d.ts
 
 #data
 /backend/src/data
+/backend/data
 
 #backup
 /backend/src/backup
+/backend/backup
+
+# user uploads
+/backend/uploads
+
+#users
+/backend/users.json
+
 # storage keys
 /backend/gcs-key.json
+
+# local settings
+/frontend/src/config/localSettings.js
+/backend/src/config/localSettings.js
+
+# .env files
+/.env
+/backend/.env
+/frontend/.env
+/.env.local
+/.env.development.local
+/.env.test.local
+/.env.production.local
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+/backend/.env.local
+/backend/.env.development.local
+/backend/.env.test.local
+/backend/.env.production.local
+
+# log files
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?   
+*.code-workspace
+
+# OS files
+Thumbs.db
+Desktop.ini 
+
+# Firebase cache
+.firebase/
+
+# MacOS files
+._* 
+.Spotlight-V100
+.Trashes
