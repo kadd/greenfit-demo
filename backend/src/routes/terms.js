@@ -154,9 +154,12 @@ router.post('/section', async (req, res) => {
     const result = await fileOps.updateJsonFile(TERMS_FILE, (terms) => {
       const sectionWithId = { 
         id: `section-${Date.now()}`, 
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         ...newSection 
       };
       terms.sections.push(sectionWithId);
+      terms.updatedAt = new Date().toISOString();
       return terms;
     });
 
@@ -187,7 +190,12 @@ router.put('/sections/:id', async (req, res) => {
         throw new Error('Abschnitt nicht gefunden');
       }
       
-      terms.sections[sectionIndex] = { id: sectionId, ...updatedSection };
+      terms.sections[sectionIndex] = { 
+        id: sectionId, 
+        ...updatedSection,
+        updatedAt: new Date().toISOString()
+      };
+      terms.updatedAt = new Date().toISOString();
       return terms;
     },
     { validate: true,
@@ -220,6 +228,7 @@ router.delete('/sections/:id', async (req, res) => {
       }
       
       terms.sections.splice(sectionIndex, 1);
+      terms.updatedAt = new Date().toISOString();
       return terms;
     },
     { validate: true,
@@ -268,6 +277,7 @@ router.post('/sections/reorder', async (req, res) => {
       });
 
       terms.sections = reorderedSections;
+      terms.updatedAt = new Date().toISOString();
       return terms;
     },
     { validate: true,

@@ -119,146 +119,150 @@ router.post('/reset', async (req, res) => {
   }
 });
 
-// Add new blog post
-router.post('/items/add', (req, res) => {
-  const newPost = req.body;
-  if (!newPost || !newPost.title || !newPost.date || !newPost.excerpt) {
-    return res.status(400).json({ error: 'Ungültige Blog-Post-Daten.' });
-  }
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log("Adding new Blog Post to:", blogPath);
-
-  // Füge eine ID hinzu
-  newPost.id = "post-" + Date.now();
-
-  // Füge ein Erstellungsdatum hinzu
-  newPost.createdAt = new Date().toISOString();
-  newPost.updatedAt = newPost.createdAt;
-
-  fs.readFile(blogPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
-    }
-    try {
-      const blog = JSON.parse(data);
-      blog.items = blog.items || [];
-      newPost.id = (blog.items.length + 1).toString();
-      blog.items.push(newPost);
-      fs.writeFile(blogPath, JSON.stringify(blog, null, 2), (writeErr) => {
-        if (writeErr) {
-          return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });
-        }
-        res.status(201).json(newPost);
-      });
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Blog-Daten sind ungültig.' });
-    }
-  });
-});
-
+// =============== INDIVIDUAL BLOG POST MANAGEMENT ================ //
 
 // Get single blog post by ID
-router.get('/items/:id', (req, res) => {
-  const postId = req.params.id;
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log(`Loading Blog Post ID ${postId} from:`, blogPath);
-  fs.readFile(blogPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
+router.get('/items/:id', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const blog = await fileOps.readJsonFile(BLOG_FILE);
+    const blogPost = blog.items.find(post => post.id === postId);
+    if (!blogPost) {
+      return res.status(404).json({ error: 'Blog-Post nicht gefunden.' });
     }
-    try {
-      const blog = JSON.parse(data);
-      const post = blog.items.find(p => p.id === postId);
-      if (!post) {
-        return res.status(404).json({ error: 'Blog-Post nicht gefunden.' });
-      }
-      res.json(post);
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Blog-Daten sind ungültig.' });
-    }
-  });
+    res.json(blogPost);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Laden des Blog-Posts',
+      details: error.message 
+    });
+  }
 });
 
-// Delete single blog post by ID
-router.delete('/items/:id', (req, res) => {
-  const postId = req.params.id;
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log(`Deleting Blog Post ID ${postId} in:`, blogPath);
-
-  fs.readFile(blogPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
+// create new blog post
+router.post('/item', async (req, res) => {
+  try {
+    const newPost = req.body;
+    if (!newPost || !newPost.title || !newPost.date || !newPost.excerpt) {
+      return res.status(400).json({ error: 'Ungültige Blog-Post-Daten.' });
     }
-    try {
-      const blog = JSON.parse(data);
-      const postIndex = blog.items.findIndex(p => p.id === postId);   
-      if (postIndex === -1) {
-        return res.status(404).json({ error: 'Blog-Post nicht gefunden.' });
-      }
-      blog.items.splice(postIndex, 1);
 
-      // Aktualisiere das Blog-Datum
+    const result = await fileOps.updateJsonFile(BLOG_FILE, (blog) => {
+      const newPostWithMeta = {
+        ...newPost,
+        id: `post-${blog.items.length + 1}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      blog.items.push(newPostWithMeta);
       blog.updatedAt = new Date().toISOString();
+      return blog;
+    }, { backup: true, validate: true });
 
-      fs.writeFile(blogPath, JSON.stringify(blog, null, 2), (writeErr) => {
-        if (writeErr) {
-          return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });
-        }
-        res.json({ message: 'Blog-Post wurde gelöscht.' });
-      });
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Blog-Daten sind ungültig.' });
-    }
-  });
+    // Neue Blog-Post zurückgeben
+    const newPostFromResult = result.items[result.items.length - 1];
+    res.status(201).json(newPostFromResult);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Hinzufügen des Blog-Posts',
+      details: error.message 
+    });
+  }
 });
 
 // Update single blog post by ID
-router.put('/items/:id', (req, res) => {
-  const postId = req.params.id;
-  const updatedPost = req.body;
-  const blogPath = path.join(__dirname, '../data/blog.json');
-  console.log(`Updating Blog Post ID ${postId} in:`, blogPath);
+router.put('/items/:id', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const updatedData = req.body;
 
-  // Optional: Validierung
-  if (!updatedPost || !updatedPost.title || !updatedPost.date || !updatedPost.excerpt) {
-    console.log("Invalid blog post data:", updatedPost);
-    return res.status(400).json({ error: 'Ungültige Blog-Post-Daten.' });
-  }
-
-  fs.readFile(blogPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Blog konnte nicht geladen werden.' });
+    if( !updatedData || !updatedData.title || !updatedData.date || !updatedData.excerpt) {
+      return res.status(400).json({ error: 'Ungültige Blog-Post-Daten.' });
     }
-    try {
-      const blog = JSON.parse(data);
+
+    const result = await fileOps.updateJsonFile(BLOG_FILE, (blog) => {
       const postIndex = blog.items.findIndex(p => p.id === postId);
       if (postIndex === -1) {
-        return res.status(404).json({ error: 'Blog-Post nicht gefunden.' });
+        throw new Error('Blog-Post nicht gefunden.');
       }
-      blog.items[postIndex] = { ...blog.items[postIndex], ...updatedPost };
+      const existingPost = blog.items[postIndex];
+      const updatedPost = {
+        ...existingPost,
+        ...updatedData,
+        id: existingPost.id, // ID beibehalten
+        updatedAt: new Date().toISOString(),
+      };
+      blog.items[postIndex] = updatedPost;
       blog.updatedAt = new Date().toISOString();
+      return blog;
+    }, { backup: true, validate: true });
 
-      // Backup der aktuellen Daten vor dem Speichern
-      backupData().then((backupPath) => {
-        console.log("Backup erstellt unter:", backupPath);
-      }).catch((err) => {
-        console.error("Fehler beim Erstellen des Backups:", err);
-      });
-
-      // Speichere die aktualisierten Blog-Daten
-      fs.writeFile(blogPath, JSON.stringify(blog, null, 2), (writeErr) => {
-        if (writeErr) {
-          return res.status(500).json({ error: 'Blog konnte nicht gespeichert werden.' });
-        }
-        res.json(blog.items[postIndex]);
-      });
-    } catch (parseErr) {
-      res.status(500).json({ error: 'Blog-Daten sind ungültig.' });
-    }
-  });
+    const updatedPostFromResult = result.items.find(p => p.id === postId);
+    res.json(updatedPostFromResult);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Fehler beim Aktualisieren des Blog-Posts',
+      details: error.message 
+    });
+  }
 });
 
 
+// Delete single blog post by ID
+router.delete('/items/:id', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const result = await fileOps.updateJsonFile(BLOG_FILE, (blog) => {
+      const postIndex = blog.items.findIndex(p => p.id === postId);
+      if (postIndex === -1) {
+        throw new Error('Blog-Post nicht gefunden.');
+      }
+      blog.items.splice(postIndex, 1);
+      blog.updatedAt = new Date().toISOString();
+      return blog;
+    }, { backup: true, validate: true });
+
+    res.json({ message: 'Blog-Post wurde gelöscht.', data: result });
+  } catch (error) {
+    if (error.message === 'Blog-Post nicht gefunden.') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({
+        error: 'Fehler beim Löschen des Blog-Posts',
+        details: error.message
+      });
+    }
+  }
+});
+
+router.post('/items/reorder', async (req, res) => {
+  try {
+    const { newOrder } = req.body;
+    if (!Array.isArray(newOrder)) {
+      return res.status(400).json({ error: 'Ungültige Reihenfolge-Daten.' });
+    }
+
+    const result = await fileOps.updateJsonFile(BLOG_FILE, (blog) => {
+      const reorderedItems = [];
+      newOrder.forEach(id => {
+        const item = blog.items.find(post => post.id === id);
+        if (item) {
+          reorderedItems.push(item);
+        }
+      });
+      blog.items = reorderedItems;
+      blog.updatedAt = new Date().toISOString();
+      return blog;
+    }, { backup: true, validate: true });
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Fehler beim Neuordnen der Blog-Posts',
+      details: error.message
+    });
+  }
+});
 
 
 module.exports = router;

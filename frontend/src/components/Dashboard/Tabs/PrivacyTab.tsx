@@ -1,6 +1,6 @@
 // frontend/src/components/Dashboard/Tabs/PrivacyTab.tsx
 import React from "react";
-import PrivacyEditor from "@/components/Dashboard/Editors/privacy/PrivacyEditor";
+import PrivacyEditor from "@/components/Dashboard/Editors/privacy/PrivacyEditor1.1";
 import { Privacy, PrivacySection } from "@/types/privacy";
 import { usePrivacy } from "@/hooks/usePrivacy";
 

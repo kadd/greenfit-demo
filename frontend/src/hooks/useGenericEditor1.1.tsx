@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 // frontend/src/hooks/useGenericEditor.tsx - Reusable Editor Logic
 
@@ -190,9 +190,18 @@ export function useGenericEditor<T extends BaseData, I extends BaseItem>({
   }, []);
 
   // Search funktionalität
-  const filteredItems = searchQuery 
-    ? searchItems(searchQuery)
-    : editForm.items; // nur items?
+  const filteredItems = useMemo(() => {
+    const list = (editForm as any)[itemKey] || [];
+    console.log('Filtering items with searchQuery:', searchQuery);
+    console.log('Current items list:', list);
+    if (!searchQuery || !searchQuery.trim()) return list;
+    try {
+      return searchItems(searchQuery) || [];
+    } catch {
+      return list;
+    }
+
+  }, [editForm, itemKey, searchItems, searchQuery]);
 
   // Drag-and-Drop Funktionalität könnte hier noch hinzugefügt werden
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);

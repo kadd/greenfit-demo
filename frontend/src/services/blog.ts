@@ -12,7 +12,7 @@ const API_URL = getApiUrl();
 
 
 // Fetch all blog data
-export async function fetchBlog() {
+export async function fetchBlogService() {
   try {
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error("Fehler beim Laden des Blogs");
@@ -23,50 +23,60 @@ export async function fetchBlog() {
 }   
 
 //create empty blog
-export async function createBlog(token: string) {
-  const res = await fetch(`${API_URL}/create`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ title: "Neuer Blog", description: "Beschreibung", items: [] }),
-  });
-  if (!res.ok) throw new Error("Fehler beim Erstellen des Blogs");
-  return res.json();
+export async function createBlogService(token: string) {
+  try {
+    const res = await fetch(`${API_URL}/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title: "Neuer Blog", description: "Beschreibung", items: [] }),
+    });
+    if (!res.ok) throw new Error("Fehler beim Erstellen des Blogs");
+    return await res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Erstellen des Blogs");
+  }
 }
 
 //delete entire blog
-export async function deleteBlog(token: string) {
-  const res = await fetch(`${API_URL}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!res.ok) throw new Error("Fehler beim Löschen des Blogs");
-  return res.json();
+export async function deleteBlogService(token: string) {
+  try {
+    const res = await fetch(`${API_URL}`, {
+      method: "DELETE",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error("Fehler beim Löschen des Blogs");
+    return await res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Löschen des Blogs");
+  }
 }
 
 // update entire blog
-export async function updateBlog(token: string, blog: Partial<Blog>) {
-  // Zeit messen
-  
+export async function updateBlogService(token: string, blog: Partial<Blog>) {
+ try {
    const res = await fetch(`${API_URL}`, {
        method: "PUT",
        headers: {
-       "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(blog),
-    });
-      
+         "Content-Type": "application/json",
+         'Authorization': `Bearer ${token}`,
+       },
+       body: JSON.stringify(blog),
+     });
+
     if (!res.ok) {
       console.log('Response status:', res.status);
       console.log('Response status text:', res.statusText);
-      throw new Error("Failed to update blog");
+      throw new Error("Fehler beim Aktualisieren des Blogs");
     }
     return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Aktualisieren des Blogs");
+  }
 }
 
 // Weitere Blog-bezogene Dienste können hier hinzugefügt werden
@@ -75,22 +85,26 @@ export async function updateBlog(token: string, blog: Partial<Blog>) {
 // und können Authentifizierungstoken als Parameter akzeptieren, wenn nötig.    
 
 // Create a new blog post
-export async function createPost(token: string, postData: Partial<BlogItem>) {
-  const res = await fetch(`${API_URL}/items/add`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(postData),
-  });
-  if (!res.ok) throw new Error("Fehler beim Erstellen des Blogposts");
-  return res.json();
+export async function createBlogPostService(token: string, postData: Partial<BlogItem>) {
+  try {
+    const res = await fetch(`${API_URL}/item`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(postData),
+    });
+    if (!res.ok) throw new Error("Fehler beim Erstellen des Blogposts");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Erstellen des Blogposts");
+  }
 }
 
 
 // Fetch a single blog post by ID
-export async function fetchSinglePostById(postId: string) {
+export async function fetchSingleBlogPostByIdService(postId: string) {
   try {
     const res = await fetch(`${API_URL}/items/${postId}`);
     if (!res.ok) throw new Error("Fehler beim Laden des Blogposts");
@@ -101,55 +115,111 @@ export async function fetchSinglePostById(postId: string) {
 }
 
 // delete a blog post by ID
-export async function deletePostById(token: string, postId: string) {
-  const res = await fetch(`${API_URL}/items/${postId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!res.ok) throw new Error("Fehler beim Löschen des Blogposts");
-  return res.json();
+export async function deleteBlogPostByIdService(token: string, postId: string) {
+  try {
+    const res = await fetch(`${API_URL}/items/${postId}`, {
+      method: "DELETE",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error("Fehler beim Löschen des Blogposts");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Löschen des Blogposts");
+  }
 }
 
-export async function updatePostById(token: string, postId: string, postData: Partial<BlogItem>) {
+
+// update a blog post by ID
+export async function updateBlogPostByIdService(token: string, postId: string, postData: Partial<BlogItem>) {
+  try {
     const res = await fetch(`${API_URL}/items/${postId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(postData),
     });
-    if (!res.ok) throw new Error("Failed to update post");
+    if (!res.ok) throw new Error("Fehler beim Aktualisieren des Blogposts");
     return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Aktualisieren des Blogposts");
+  }
 }
 
-export async function uploadPostImage(token: string, postId: string, file: File) {
-  const formData = new FormData();
-  formData.append("image", file);
+// reset blog service - deletes all posts
+export async function resetBlogService(token: string) {
+  try {
+    const res = await fetch(`${API_URL}/reset`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error("Fehler beim Zurücksetzen des Blogs");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Zurücksetzen des Blogs");
+  }
+}   
 
-  const res = await fetch(`${API_URL}/upload-image/${postId}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData,
-  });
-  if (!res.ok) throw new Error("Fehler beim Hochladen des Bildes");
-  return res.json();
+// upload image for a blog post
+export async function uploadBlogPostImageService(token: string, postId: string, file: File) {
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch(`${API_URL}/upload-image/${postId}`, {
+      method: "POST",
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData,
+    });
+    if (!res.ok) throw new Error("Fehler beim Hochladen des Bildes");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Hochladen des Bildes");
+  }
 }
 
-export async function deletePostImage(token: string, postId: string, imageId: string) { 
+
+// delete image from a blog post
+export async function deleteBlogPostImageService(token: string, postId: string, imageId: string) {
+  try {
     const res = await fetch(`${API_URL}/delete-image/${postId}/${imageId}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { 'Authorization': `Bearer ${token}` },
   });
   if (!res.ok) throw new Error("Fehler beim Löschen des Bildes");
   return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Löschen des Bildes");
+  }
+} 
+
+// reorder blog posts
+export async function reorderBlogPostsService(token: string, newOrder: string[]) {
+  try {
+    const res = await fetch(`${API_URL}/reorder`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ order: newOrder }),
+    });
+    if (!res.ok) throw new Error("Fehler beim Neuordnen der Blogposts");
+    return res.json();
+  } catch (err) {
+    throw new Error("Fehler beim Neuordnen der Blogposts");
+  }
 }
 
-
-
-
+// Weitere Blog-bezogene Dienste können hier hinzugefügt werden
+// z.B. fetchSinglePost, createPost, updatePost, deletePost etc.
+// Diese Funktionen sollten entsprechende API-Endpunkte auf dem Backend ansprechen
+// und können Authentifizierungstoken als Parameter akzeptieren, wenn nötig.
 
 
 

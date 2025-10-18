@@ -1,35 +1,49 @@
 import { useState, useEffect, use } from "react";
 
-import { Blog, BlogItem } from "@/types/blog";
+import { Blog, BlogPost } from "@/types/blog";
 
-import { fetchBlog, createBlog, deleteBlog, 
-  updateBlog, createPost, fetchSinglePostById, 
-  deletePostById, updatePostById, uploadPostImage, deletePostImage
- } from "@/services/blog";
+import {
+  fetchBlogService,
+  createBlogService,
+  deleteBlogService,
+  updateBlogService,
+  createBlogPostService,
+  fetchSingleBlogPostByIdService,
+  deleteBlogPostByIdService,
+  updateBlogPostByIdService,
+  uploadBlogPostImageService,
+  deleteBlogPostImageService
+} from "@/services/blog";
 
 
 export function useBlog() {
+  const token = localStorage.getItem("token") || "";
+
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<boolean>(false);
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   useEffect(() => {
-    async function fetchBlogs() {
-      setLoading(true);
-      setError(null);
-      try {
-        // Beispiel: Hole Blogs von einer API
-        const data = await fetchBlog();
-        setBlog(data);
-      } catch (err: any) {
-        setError(err.message || "Unbekannter Fehler");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchBlogs();
+    fetchBlog();
   }, []);
+
+  const fetchBlog = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchBlogService();
+      setBlog(data);
+      return data;
+    } catch (err: any) {
+      setError(err.message || "Unbekannter Fehler");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
 
   
   // Funktionen für Blog-Operationen
@@ -43,49 +57,65 @@ export function useBlog() {
   // Funktion zum Löschen eines bestehenden Posts anhand der ID
   // Funktion zum Aktualisieren eines bestehenden Posts anhand der ID
 
-  const createNewBlog = async (token: string, blogData: Blog) => {
+  const createNewBlog = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await createBlog(token, blogData);
+      const data = await createBlogService(token);
       setBlog(data); // Setze das gesamte Blog-Objekt
       return data;
     } catch (err: any) {
-      setError(err.message || "Unbekannter Fehler");
+      setError(err.message || "Fehler beim Erstellen des Blogs");
+      return null;
     } finally {
       setLoading(false);
     }
   }
 
-   const updateExistingBlog = async (token: string, blog: Partial<Blog>) => {
-    setLoading(true);
+   const updateExistingBlog = async (blog: Partial<Blog>) => {
+    if(!token) {
+      setError("Kein Auth-Token gefunden! Bitte einloggen.");
+      return;
+    }
+    setSaving(true);
     setError(null);
+
     try {
-        const data = await updateBlog(token, blog);
+        const data = await updateBlogService(token, blog);
         setBlog(data); // <--- Einfach das neue Blog-Objekt setzen!
-        setLoading(false);
+        setLastSaved(new Date());
         return data;
     } catch (err: any) {
-        setError(err.message || "Unbekannter Fehler");
+        setError(err.message || "Fehler beim Aktualisieren des Blogs");
+        return null;
     } finally {
-        setLoading(false);
+        setSaving(false);
     }
   };
 
-  const deleteExistingBlog = async (token: string, blogId: string) => {
+  const deleteExistingBlog = async () => {
+    if(!token) {
+      setError("Kein Auth-Token gefunden! Bitte einloggen.");
+      return;
+    }
     setLoading(true);
+    setSaving(true);
     setError(null);
     try {
-      await deleteBlog(token, blogId);
+      await deleteBlogService(token);
       setBlog(null); // Blog wurde gelöscht
+      setLastSaved(new Date());
     } catch (err: any) {
-      setError(err.message || "Unbekannter Fehler");
+      setError(err.message || "Fehler beim Löschen des Blogs");
+      return null;
     } finally {
       setLoading(false);
     }
   };
 
-  const createNewPost = async (token: string, post: BlogItem) => {
+  // ============ Blog Post Operations ============
+
+  const createNewBlogPostItem = async (post: BlogItem) => {
     setLoading(true);
     setError(null);
     try {
